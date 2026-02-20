@@ -16,6 +16,8 @@ interface TeachingAccount {
   shift: string;
   benefits?: string[];
   is_active: boolean;
+  is_hiring?: boolean;
+  icon?: string;
   status: string;
   created_at: string;
 }
@@ -34,6 +36,8 @@ export default function TeachingAccountsAdminPage() {
     shift: string;
     benefits: string[];
     is_active: boolean;
+    is_hiring: boolean;
+    icon?: string;
     status: string;
   }>({
     country: '',
@@ -43,6 +47,8 @@ export default function TeachingAccountsAdminPage() {
     shift: '',
     benefits: [],
     is_active: true,
+    is_hiring: false,
+    icon: '🌍',
     status: 'Active',
   });
   const [showForm, setShowForm] = useState(false);
@@ -82,7 +88,7 @@ export default function TeachingAccountsAdminPage() {
       }
       setShowForm(false);
       setEditingId(null);
-      setFormData({ country: '', rate_per_hour: 0, available_slots: 0, description: '', shift: '', benefits: [], is_active: true, status: 'Active' });
+      setFormData({ country: '', rate_per_hour: 0, available_slots: 0, description: '', shift: '', benefits: [], is_active: true, is_hiring: false, icon: '🌍', status: 'Active' });
       loadAccounts();
     } catch (error) {
       console.error('Error saving account:', error);
@@ -112,6 +118,8 @@ export default function TeachingAccountsAdminPage() {
       shift: account.shift || '',
       benefits: account.benefits || [],
       is_active: account.is_active,
+      is_hiring: account.is_hiring || false,
+      icon: account.icon || '🌍',
       status: account.status || 'Active',
     });
     setShowForm(true);
@@ -166,8 +174,8 @@ export default function TeachingAccountsAdminPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">Teaching Accounts</h1>
-              <p className="text-gray-600">Manage teaching accounts and availability</p>
+              <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">Teachers & Accounts Management</h1>
+              <p className="text-gray-600">Manage teacher profiles and availability</p>
             </div>
             <button
               onClick={() => {
@@ -328,6 +336,34 @@ export default function TeachingAccountsAdminPage() {
                     <div className="flex items-center gap-3 p-4 bg-white rounded-lg border-2 border-gray-300 hover:border-green-300 transition">
                       <input
                         type="checkbox"
+                        id="is_hiring"
+                        checked={formData.is_hiring}
+                        onChange={(e) => setFormData({ ...formData, is_hiring: e.target.checked })}
+                        className="w-5 h-5 cursor-pointer accent-green-600 rounded"
+                      />
+                      <div className="flex-1">
+                        <label htmlFor="is_hiring" className="text-sm font-semibold text-black cursor-pointer block mb-1">
+                          {formData.is_hiring ? '🎯 Actively Hiring' : 'Not Actively Hiring'}
+                        </label>
+                        <p className="text-xs text-gray-600">
+                          {formData.is_hiring ? 'Shows "HIRING NOW" badge on account card' : 'Hidden from hiring filter'}
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">Account Icon/Emoji</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., 🌍, 🏢, ⭐"
+                        maxLength={2}
+                        value={formData.icon || ''}
+                        onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                        className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-100 transition bg-gray-50"
+                      />
+                    </div>
+                    <div className="flex items-center gap-3 p-4 bg-white rounded-lg border-2 border-gray-300 hover:border-green-300 transition">
+                      <input
+                        type="checkbox"
                         id="is_active"
                         checked={formData.is_active}
                         onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
@@ -378,11 +414,11 @@ export default function TeachingAccountsAdminPage() {
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-              <span className="ml-3 text-gray-600 font-semibold">Loading teaching accounts...</span>
+              <span className="ml-3 text-gray-600 font-semibold">Loading teacher profiles...</span>
             </div>
           ) : accounts.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-              <p className="text-gray-500 text-lg font-semibold">No teaching accounts yet</p>
+              <p className="text-gray-500 text-lg font-semibold">No teacher profiles yet</p>
               <p className="text-gray-400 text-sm mt-1">Click "+ Add New Teacher Account" above to create one</p>
             </div>
           ) : (

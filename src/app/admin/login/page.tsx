@@ -41,8 +41,8 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-purple-50 flex flex-col relative overflow-hidden">
       {/* Decorative gradient blobs */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-l from-purple-200 to-transparent rounded-full opacity-30 blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-r from-pink-200 to-transparent rounded-full opacity-30 blur-3xl"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-l from-purple-200 to-transparent rounded-full opacity-30 blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-linear-to-r from-pink-200 to-transparent rounded-full opacity-30 blur-3xl"></div>
 
       {/* Navigation */}
       <nav className="bg-white shadow-sm relative z-10">

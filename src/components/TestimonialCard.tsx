@@ -19,11 +19,11 @@ export const TestimonialCard = ({ name, role, image, content, rating }: Testimon
       </div>
 
       {/* Testimonial Content */}
-      <p className="text-gray-700 flex-grow mb-6 leading-relaxed italic">"{content}"</p>
+      <p className="text-gray-700 grow mb-6 leading-relaxed italic">"{content}"</p>
 
       {/* Author Info */}
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0">
+        <div className="w-12 h-12 bg-linear-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-lg font-bold shrink-0">
           {image || name.charAt(0)}
         </div>
         <div>

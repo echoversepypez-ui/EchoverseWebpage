@@ -14,6 +14,7 @@ interface Contact {
   phone: string | null;
   subject: string;
   message: string;
+  agreed_to_terms: boolean;
   status: 'new' | 'read' | 'responded';
   created_at: string;
 }
@@ -24,6 +25,9 @@ export default function ContactsAdminPage() {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
     loadContacts();
@@ -58,14 +62,29 @@ export default function ContactsAdminPage() {
   };
 
   const deleteContact = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this contact?')) return;
+    if (!confirm('Are you sure you want to delete this contact? This action cannot be undone.')) return;
+    
+    setDeleting(true);
+    setDeleteError(null);
+    
     try {
       const { error } = await supabase.from('contacts').delete().eq('id', id);
-      if (error) throw error;
+      
+      if (error) {
+        console.error('Delete error details:', error);
+        setDeleteError(`Failed to delete: ${error.message || 'Unknown error occurred'}`);
+        return;
+      }
+      
+      setSuccessMessage('Contact deleted successfully!');
       loadContacts();
       setSelectedContact(null);
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
       console.error('Error deleting contact:', error);
+      setDeleteError(error instanceof Error ? error.message : 'Failed to delete contact');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -195,6 +214,18 @@ export default function ContactsAdminPage() {
                             {new Date(selectedContact.created_at).toLocaleDateString()} at{' '}
                             {new Date(selectedContact.created_at).toLocaleTimeString()}
                           </p>
+                          <p>
+                            <span className="font-semibold text-gray-900">Agreed to Terms:</span>
+                            <span
+                              className={`ml-2 inline-block px-2 py-1 rounded text-xs font-semibold ${
+                                selectedContact.agreed_to_terms
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-red-100 text-red-800'
+                              }`}
+                            >
+                              {selectedContact.agreed_to_terms ? '✓ Yes' : '✗ No'}
+                            </span>
+                          </p>
                         </div>
                       </div>
                       <span
@@ -211,32 +242,50 @@ export default function ContactsAdminPage() {
                       <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{selectedContact.message}</p>
                     </div>
 
+                    {/* Success Message */}
+                    {successMessage && (
+                      <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <p className="text-green-700 font-semibold">✓ {successMessage}</p>
+                      </div>
+                    )}
+
+                    {/* Error Message */}
+                    {deleteError && (
+                      <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-red-700 font-semibold">✗ Error</p>
+                        <p className="text-red-600 text-sm mt-1">{deleteError}</p>
+                      </div>
+                    )}
+
                     <div className="flex gap-3 flex-wrap">
                       <button
                         onClick={() => updateStatus(selectedContact.id, 'read')}
+                        disabled={deleting}
                         className={`px-4 py-2 rounded-lg font-semibold transition ${
                           selectedContact.status === 'read'
                             ? 'bg-linear-to-r from-purple-600 to-pink-600 text-white shadow-lg'
                             : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                        }`}
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
                         ✓ Mark as Read
                       </button>
                       <button
                         onClick={() => updateStatus(selectedContact.id, 'responded')}
+                        disabled={deleting}
                         className={`px-4 py-2 rounded-lg font-semibold transition ${
                           selectedContact.status === 'responded'
                             ? 'bg-green-600 text-white shadow-lg'
                             : 'bg-green-100 text-green-700 hover:bg-green-200'
-                        }`}
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
                         ✓ Mark as Responded
                       </button>
                       <button
                         onClick={() => deleteContact(selectedContact.id)}
-                        className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold hover:bg-red-200 transition"
+                        disabled={deleting}
+                        className="px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold hover:bg-red-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        🗑️ Delete
+                        {deleting ? '⏳ Deleting...' : '🗑️ Delete'}
                       </button>
                     </div>
                   </div>

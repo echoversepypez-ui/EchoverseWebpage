@@ -1,12 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { usePageSections } from '@/hooks/usePageSections';
 
 export const FAQSection = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const { getSection, loading } = usePageSections();
   const section = getSection('faq');
+
+  const handleToggle = useCallback((index: number) => {
+    setOpenIndex((prevIndex) => (prevIndex === index ? null : index));
+  }, []);
 
   if (loading || !section) {
     return (
@@ -33,7 +37,7 @@ export const FAQSection = () => {
           {faqs.map((item: any, i: number) => (
             <div key={i} className="border-2 border-gray-200 rounded-lg hover:border-black transition">
               <button
-                onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                onClick={() => handleToggle(i)}
                 className="w-full p-4 flex justify-between items-center hover:bg-gray-50 transition"
               >
                 <h3 className="text-base font-bold text-black text-left">{item.q}</h3>

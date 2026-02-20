@@ -1,31 +1,33 @@
 'use client';
 
 import Link from 'next/link';
+import React, { useState, useEffect } from 'react';
 import { StatsCard } from '@/components/StatsCard';
 import { BenefitCard } from '@/components/BenefitCard';
 import { Footer } from '@/components/Footer';
+import { useAdminProfiles, useTeachersProfiles, useStaffProfiles } from '@/hooks/useProfileManagement';
 
 export default function AboutPage() {
+  const admins = useAdminProfiles();
+  const teachers = useTeachersProfiles();
+  const staff = useStaffProfiles();
+  const [isClient, setIsClient] = useState(false);
+  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(0);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Calculate total active team members
+  const totalTeamMembers = teachers.data.length + admins.data.length + staff.data.length;
+  const totalLessonsDelivered = (teachers.data.reduce((sum, t) => sum + (t.lessons_completed || 0), 0)) || 0;
+  const averageRating = teachers.data.length > 0 
+    ? (teachers.data.reduce((sum, t) => sum + (t.rating || 0), 0) / teachers.data.length).toFixed(1)
+    : '4.9';
+
   return (
     <div className="min-h-screen bg-white">
-      <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-lg">🎓</div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Echoverse</span>
-            </Link>
-            <div className="hidden md:flex space-x-1">
-              <Link href="/" className="px-4 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-100 rounded-lg transition font-medium">Home</Link>
-              <Link href="/courses" className="px-4 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-100 rounded-lg transition font-medium">Teaching Accounts</Link>
-              <Link href="/about" className="px-4 py-2 text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-semibold">About</Link>
-              <Link href="/contact" className="px-4 py-2 text-gray-700 hover:text-purple-600 hover:bg-gray-100 rounded-lg transition font-medium">Contact</Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      <section className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white py-24">
+      <section className="bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 text-white py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl sm:text-6xl font-bold mb-6">About Echoverse</h1>
           <p className="text-xl text-gray-300 leading-relaxed">
@@ -38,7 +40,7 @@ export default function AboutPage() {
         <div className="grid md:grid-cols-2 gap-16 items-center">
           <div className="space-y-6">
             <div>
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">Our Mission</h2>
+              <h2 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">Our Mission</h2>
               <p className="text-lg text-gray-700 leading-relaxed">
                 Echoverse is an ESL teaching platform based in Antique, Philippines, dedicated to connecting qualified English teachers with students across Asia.
               </p>
@@ -59,36 +61,43 @@ export default function AboutPage() {
             </div>
           </div>
           <div className="grid gap-6">
-            <StatsCard icon="👥" number="500+" label="Active Teachers" />
-            <StatsCard icon="👨‍🎓" number="12,000+" label="Students Taught" />
+            <StatsCard icon="👥" number={`${totalTeamMembers}+`} label="Active Educators" />
+            <StatsCard icon="👨‍🎓" number={`${totalLessonsDelivered}+`} label="Lessons Delivered" />
             <StatsCard icon="🌍" number="8+" label="Countries Served" />
-            <StatsCard icon="⭐" number="4.9/5" label="Average Rating" />
+            <StatsCard icon="⭐" number={`${averageRating}/5`} label="Average Rating" />
           </div>
         </div>
       </section>
 
-      <section className="bg-gradient-to-br from-slate-50 to-slate-100 py-20">
+      <section className="bg-linear-to-br from-slate-50 to-slate-100 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent text-center mb-16">Meet Our Team</h2>
+          <h2 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent text-center mb-16">Meet Our Team</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { name: 'Maria Santos', role: 'Founder & CEO', bio: 'ESL educator with 10+ years of experience building educational platforms' },
-              { name: 'Juan Dela Cruz', role: 'Operations Manager', bio: 'Passionate about teacher support and ensuring educator success' },
-              { name: 'Ana Reyes', role: 'Community Manager', bio: 'Building meaningful relationships with educators and students worldwide' },
-            ].map((member, i) => (
-              <div key={i} className="bg-white border-2 border-gray-200 rounded-xl p-8 hover:border-purple-500 hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 group">
-                <div className="text-6xl mb-4 group-hover:scale-110 transition duration-300">👤</div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{member.name}</h3>
-                <p className="font-semibold text-purple-600 mb-4">{member.role}</p>
-                <p className="text-gray-600 leading-relaxed">{member.bio}</p>
-              </div>
-            ))}
+            {admins.loading ? (
+              <div className="col-span-full text-center py-12 text-gray-600">Loading team members...</div>
+            ) : admins.error ? (
+              <div className="col-span-full text-center py-12 text-red-600">Error loading team: {admins.error}</div>
+            ) : admins.data.length === 0 ? (
+              <div className="col-span-full text-center py-12 bg-white rounded-xl">No team members available</div>
+            ) : (
+              admins.data.map((member) => (
+                <div key={member.id} className="bg-white border-2 border-gray-200 rounded-xl p-8 hover:border-purple-500 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                  <div className="text-6xl mb-4 group-hover:scale-110 transition duration-300">👤</div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{member.name}</h3>
+                  <p className="font-semibold text-purple-600 mb-4">{member.role}</p>
+                  <p className="text-gray-600 leading-relaxed">{member.bio || member.story || 'Team member'}</p>
+                  {member.department && (
+                    <p className="text-sm text-gray-500 mt-3">📍 {member.department}</p>
+                  )}
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <h2 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent text-center mb-16">Our Core Values</h2>
+        <h2 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent text-center mb-16">Our Core Values</h2>
         <div className="grid md:grid-cols-3 gap-8">
           {[
             { icon: '💰', title: 'Fair Compensation', description: 'We believe educators deserve competitive compensation for their expertise and dedication.' },
@@ -100,12 +109,136 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white py-20">
+      <section className="bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 text-white py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl sm:text-5xl font-bold mb-6">Join Our Growing Community</h2>
           <p className="text-xl text-gray-300 mb-10 leading-relaxed">Start earning money teaching English to passionate international students today.</p>
-          <Link href="/courses" className="inline-block px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:opacity-90 transition transform hover:scale-105">
-            View Teaching Opportunities →
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/#accounts-available" className="inline-block px-8 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:opacity-90 transition transform hover:scale-105">
+              View Teaching Opportunities →
+            </Link>
+            <Link href="/contact" className="inline-block px-8 py-3 bg-white text-purple-600 rounded-lg font-bold hover:bg-gray-100 transition">
+              Contact Us
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">Why Choose Echoverse?</h2>
+          <p className="text-xl text-gray-600">Everything you need to succeed as an ESL educator</p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          {[
+            { emoji: '💵', title: 'Competitive Pay', desc: '$15-25+ per hour depending on experience', detail: 'Highest rates in the industry. Earn $500-$2,000+ monthly' },
+            { emoji: '🎯', title: 'Flexible Schedule', desc: 'Work when you want, set your own hours', detail: 'Teach 5 hours/week or 40+. You\'re always in control' },
+            { emoji: '🚀', title: 'Quick Start', desc: 'Get approved and start teaching in 48 hours', detail: 'Simple verification process with instant onboarding' },
+            { emoji: '👥', title: 'Global Community', desc: 'Connect with motivated students worldwide', detail: 'Students from 8+ countries eager to learn English' },
+            { emoji: '📈', title: 'Career Growth', desc: 'Advance to senior roles and mentorship positions', detail: 'Become a mentor, trainer, or curriculum developer' },
+            { emoji: '🎓', title: 'Complete Support', desc: '24/7 support team & continuous training', detail: 'Materials, lesson plans, and pro tips provided' }
+          ].map((item, i) => (
+            <div key={i} className="bg-linear-to-br from-purple-50 to-pink-50 p-8 rounded-xl border-2 border-purple-200 hover:border-purple-500 hover:shadow-lg transition-all duration-300 group">
+              <div className="text-5xl mb-4 group-hover:scale-110 transition duration-300">{item.emoji}</div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">{item.title}</h3>
+              <p className="text-gray-700 font-semibold mb-3">{item.desc}</p>
+              <p className="text-sm text-purple-700 italic">{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="bg-slate-50 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent text-center mb-16">What Teachers Say</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { name: 'Sarah Johnson', role: 'ESL Teacher', quote: 'Echoverse made it so easy to earn from home! The pay is fair and the students are incredibly motivated.', rating: 5 },
+              { name: 'Marco Rodriguez', role: 'Part-time Educator', quote: 'I love the flexibility. I can teach around my main job and still earn substantial income. Great support team!', rating: 5 },
+              { name: 'Elena Chen', role: 'Full-time Teacher', quote: 'Best platform I\'ve worked with. Professional, organized, and my students are awesome. Highly recommended!', rating: 5 }
+            ].map((testimonial, i) => (
+              <div key={i} className="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition">
+                <div className="flex gap-1 mb-4">
+                  {[...Array(testimonial.rating)].map((_, j) => (
+                    <span key={j} className="text-yellow-400 text-lg">⭐</span>
+                  ))}
+                </div>
+                <p className="text-gray-700 italic mb-6">"{testimonial.quote}"</p>
+                <p className="font-bold text-gray-900">{testimonial.name}</p>
+                <p className="text-sm text-purple-600">{testimonial.role}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <h2 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent text-center mb-16">Frequently Asked Questions</h2>
+        <div className="space-y-4">
+          {[
+            { q: 'How much can I earn teaching with Echoverse?', a: 'Teachers typically earn $15-25+ per hour depending on their experience, qualifications, and student feedback. Many teachers earn $500-2000+ per month on a part-time basis.' },
+            { q: 'What qualifications do I need?', a: 'You need to be a native English speaker or have near-native proficiency, have a high school diploma minimum (bachelor\'s degree preferred), and pass our background check.' },
+            { q: 'How flexible is the schedule?', a: 'Very flexible! You set your availability. You can teach as few as 5 hours per week or 40+ hours. You\'re in complete control.' },
+            { q: 'Do you provide training?', a: 'Yes! We provide comprehensive onboarding, teaching materials, and ongoing professional development. Our support team is available 24/7.' },
+            { q: 'How do I get paid?', a: 'We pay via bank transfer, PayPal, or other local methods. Payments are processed weekly. You\'ll see your earnings dashboard in real-time.' },
+            { q: 'What technical requirements do I need?', a: 'A stable internet connection (minimum 5Mbps), a computer/laptop with a webcam, and a microphone. Most modern laptops have these built-in.' }
+          ].map((faq, i) => (
+            <div key={i} className="border-2 border-gray-200 rounded-lg overflow-hidden hover:border-purple-500 transition">
+              <button
+                onClick={() => setExpandedFAQ(expandedFAQ === i ? null : i)}
+                className="w-full px-6 py-4 bg-white hover:bg-purple-50 transition flex justify-between items-center"
+              >
+                <span className="text-lg font-bold text-gray-900 text-left">{faq.q}</span>
+                <span className={`text-purple-600 transition transform ${expandedFAQ === i ? 'rotate-180' : ''}`}>▼</span>
+              </button>
+              {expandedFAQ === i && (
+                <div className="px-6 py-4 bg-purple-50 border-t-2 border-purple-200">
+                  <p className="text-gray-700">{faq.a}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Trust Indicators */}
+      <section className="bg-linear-to-br from-purple-600 to-pink-600 text-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-4xl font-bold text-center mb-16">Why Teachers Trust Echoverse</h2>
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="bg-white bg-opacity-15 backdrop-blur-md p-8 rounded-xl border border-white border-opacity-30 hover:border-opacity-60 hover:bg-opacity-20 transition-all duration-300">
+              <div className="text-5xl font-bold mb-4">🔒</div>
+              <p className="font-bold text-lg mb-3 text-white">Secure Platform</p>
+              <p className="text-sm text-white leading-relaxed">SSL encrypted & secure payment processing with industry-leading security standards</p>
+            </div>
+            <div className="bg-white bg-opacity-15 backdrop-blur-md p-8 rounded-xl border border-white border-opacity-30 hover:border-opacity-60 hover:bg-opacity-20 transition-all duration-300">
+              <div className="text-5xl font-bold mb-4">🛡️</div>
+              <p className="font-bold text-lg mb-3 text-white">Background Verified</p>
+              <p className="text-sm text-white leading-relaxed">All teachers and staff fully vetted with comprehensive background checks</p>
+            </div>
+            <div className="bg-white bg-opacity-15 backdrop-blur-md p-8 rounded-xl border border-white border-opacity-30 hover:border-opacity-60 hover:bg-opacity-20 transition-all duration-300">
+              <div className="text-5xl font-bold mb-4">📜</div>
+              <p className="font-bold text-lg mb-3 text-white">Professional Certified</p>
+              <p className="text-sm text-white leading-relaxed">TESOL, CELTA & internationally certified educators</p>
+            </div>
+            <div className="bg-white bg-opacity-15 backdrop-blur-md p-8 rounded-xl border border-white border-opacity-30 hover:border-opacity-60 hover:bg-opacity-20 transition-all duration-300">
+              <div className="text-5xl font-bold mb-4">✅</div>
+              <p className="font-bold text-lg mb-3 text-white">Trusted Since 2020</p>
+              <p className="text-sm text-white leading-relaxed">+10,000 successful teacher-student matches & growing daily</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 text-white py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl sm:text-5xl font-bold mb-6">Ready to Start Teaching?</h2>
+          <p className="text-xl text-gray-300 mb-10 leading-relaxed">Join thousands of teachers earning flexible income while making a global impact.</p>
+          <Link href="/teachers-profile" className="inline-block px-10 py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:opacity-90 transition transform hover:scale-105">
+            Apply Now & Start Earning →
           </Link>
         </div>
       </section>

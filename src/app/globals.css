@@ -19,15 +19,98 @@
   }
 }
 
+/* Mobile-First Base Styles */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Prevent layout shift on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Touch-friendly button and link sizing */
+a, button {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile-optimized typography */
+@media (max-width: 640px) {
+  h1 {
+    @apply text-2xl sm:text-3xl;
+    line-height: 1.2;
+  }
+  
+  h2 {
+    @apply text-xl sm:text-2xl;
+    line-height: 1.3;
+  }
+  
+  h3 {
+    @apply text-lg sm:text-xl;
+    line-height: 1.3;
+  }
+  
+  p {
+    @apply text-sm sm:text-base;
+    line-height: 1.6;
+  }
+  
+  /* Better spacing on mobile */
+  section {
+    @apply py-12 px-4 sm:px-6 sm:py-16;
+  }
+  
+  /* Mobile-friendly form elements */
+  input, textarea, select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px;
+    border-radius: 8px;
+  }
+  
+  /* Improve readability on small screens */
+  .max-w-7xl {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+}
+
+@media (min-width: 641px) {
+  section {
+    @apply py-16 px-6 sm:py-20;
+  }
+}
+
+/* Responsive grid optimization */
+@media (max-width: 1024px) {
+  .grid {
+    gap: 1rem !important;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Stack grids on mobile */
+  .grid-cols-2, .grid-cols-3, .grid-cols-4 {
+    @apply grid-cols-1;
+  }
 }
 
 /* Custom scrollbar styles */
 .scrollbar::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 .scrollbar::-webkit-scrollbar-track {
@@ -49,3 +132,34 @@ body {
   scrollbar-color: #9ca3af #f0f0f0;
   scrollbar-width: thin;
 }
+
+/* Mobile-optimized animations */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Ensure images are responsive */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Safe area for notched devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+  
+  .safe-area-padding {
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+
+
