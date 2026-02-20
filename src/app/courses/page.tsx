@@ -2,4 +2,6 @@
 
 import { redirect } from 'next/navigation';
 
-redirect('/teachers-profile');
+export default function CoursesPage() {
+  redirect('/teachers-profile');
+}
