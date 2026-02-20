@@ -198,10 +198,10 @@ export const TeachingOpportunitiesSection = () => {
                   className="bg-white rounded-lg border-2 border-gray-200 hover:border-black hover:shadow-xl transition-all overflow-hidden group flex flex-col"
                 >
                   {/* Header */}
-                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 sm:p-4 border-b border-gray-200">
+                  <div className="bg-linear-to-r from-blue-50 to-purple-50 p-3 sm:p-4 border-b border-gray-200">
                     <div className="flex items-start justify-between gap-2 mb-3">
-                      <div className="flex items-center gap-2 sm:gap-3 flex-shrink min-w-0">
-                        <span className="text-3xl sm:text-4xl flex-shrink-0">{account.icon || '🌍'}</span>
+                      <div className="flex items-center gap-2 sm:gap-3 shrink min-w-0">
+                        <span className="text-3xl sm:text-4xl shrink-0">{account.icon || '🌍'}</span>
                         <div className="min-w-0">
                           <h3 className="text-base sm:text-lg font-bold text-black truncate">{account.country}</h3>
                           <p className="text-xs text-gray-600">Account</p>
@@ -223,11 +223,11 @@ export const TeachingOpportunitiesSection = () => {
                   </div>
 
                   {/* Content */}
-                  <div className="p-4 sm:p-6 flex flex-col flex-grow">
+                  <div className="p-4 sm:p-6 flex flex-col grow">
                     <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
                       <div className="flex justify-between items-center gap-2">
                         <span className="text-xs sm:text-sm text-gray-600 font-medium">Hourly Rate</span>
-                        <span className="text-xl sm:text-2xl font-bold text-black flex-shrink-0">${account.rate_per_hour}<span className="text-xs sm:text-sm">/hr</span></span>
+                        <span className="text-xl sm:text-2xl font-bold text-black shrink-0">${account.rate_per_hour}<span className="text-xs sm:text-sm">/hr</span></span>
                       </div>
                       <div className="flex justify-between items-center gap-2">
                         <span className="text-xs sm:text-sm text-gray-600 font-medium">Schedule</span>
@@ -247,7 +247,7 @@ export const TeachingOpportunitiesSection = () => {
 
                     <Link
                       href="/teachers-profile"
-                      className="block w-full text-center px-4 py-2.5 sm:py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition transform hover:scale-105 text-sm sm:text-base min-h-10 flex items-center justify-center mt-auto"
+                      className="w-full text-center px-4 py-2.5 sm:py-3 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition transform hover:scale-105 text-sm sm:text-base min-h-10 flex items-center justify-center mt-auto"
                     >
                       Apply Now
                     </Link>
@@ -268,7 +268,7 @@ export const TeachingOpportunitiesSection = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 items-center">
                     {/* Account Info */}
                     <div className="flex items-center gap-3 sm:gap-4">
-                      <span className="text-3xl sm:text-4xl flex-shrink-0">{account.icon || '🌍'}</span>
+                      <span className="text-3xl sm:text-4xl shrink-0">{account.icon || '🌍'}</span>
                       <div className="min-w-0">
                         <h3 className="text-base sm:text-lg font-bold text-black truncate">{account.country}</h3>
                         <div className="flex gap-2 mt-1 sm:mt-2 flex-wrap">
@@ -304,7 +304,7 @@ export const TeachingOpportunitiesSection = () => {
                     <div className="col-span-1 sm:text-right">
                       <Link
                         href="/teachers-profile"
-                        className="block sm:inline-block px-4 sm:px-6 py-2.5 sm:py-2 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition text-sm sm:text-base min-h-10 flex items-center justify-center"
+                        className="inline-flex sm:inline-block px-4 sm:px-6 py-2.5 sm:py-2 bg-black text-white rounded-lg font-semibold hover:bg-gray-800 transition text-sm sm:text-base min-h-10 items-center justify-center"
                       >
                         Apply Now
                       </Link>
@@ -327,7 +327,7 @@ export const TeachingOpportunitiesSection = () => {
           <div className="text-center pt-6 sm:pt-8 border-t border-gray-200">
             <Link
               href="/teachers-profile"
-              className="inline-block px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-black to-gray-800 text-white rounded-lg font-bold hover:shadow-xl transition transform hover:scale-105 text-sm sm:text-base min-h-11 flex items-center justify-center"
+              className="inline-flex px-6 sm:px-8 py-3 sm:py-4 bg-linear-to-r from-black to-gray-800 text-white rounded-lg font-bold hover:shadow-xl transition transform hover:scale-105 text-sm sm:text-base min-h-11 items-center justify-center"
             >
               Explore All Positions
             </Link>

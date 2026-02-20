@@ -181,7 +181,7 @@ export default function TeachingAccountsAdminPage() {
               onClick={() => {
                 setShowForm(true);
                 setEditingId(null);
-                setFormData({ country: '', rate_per_hour: 0, available_slots: 0, description: '', shift: '', benefits: [], is_active: true, status: 'Active' });
+                setFormData({ country: '', rate_per_hour: 0, available_slots: 0, description: '', shift: '', benefits: [], is_active: true, is_hiring: false, status: 'Active' });
               }}
               className="px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition shadow-lg"
             >

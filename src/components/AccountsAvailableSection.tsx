@@ -167,7 +167,7 @@ export function AccountsAvailableSection() {
                     </div>
                     <div className="text-right space-y-2">
                       {account.is_hiring && (
-                        <span className="inline-block px-3 py-1 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 text-xs font-black rounded-lg shadow-sm animate-pulse">
+                        <span className="inline-block px-3 py-1 bg-linear-to-r from-green-100 to-emerald-100 text-green-800 text-xs font-black rounded-lg shadow-sm animate-pulse">
                           🎯 HIRING NOW
                         </span>
                       )}
@@ -179,7 +179,7 @@ export function AccountsAvailableSection() {
                     </div>
                   </div>
 
-                  <div className="h-px bg-gradient-to-r from-purple-200 to-transparent mb-4"></div>
+                  <div className="h-px bg-linear-to-r from-purple-200 to-transparent mb-4"></div>
 
                   {/* Status & Rate */}
                   <div className="mb-4">
@@ -231,15 +231,15 @@ export function AccountsAvailableSection() {
         {/* Stats */}
         {!loading && (
           <div className="grid md:grid-cols-3 gap-6 mt-10">
-            <div className="bg-gradient-to-br from-purple-100 to-purple-50 p-8 rounded-2xl text-center border-2 border-purple-200 shadow-lg">
+            <div className="bg-linear-to-br from-purple-100 to-purple-50 p-8 rounded-2xl text-center border-2 border-purple-200 shadow-lg">
               <p className="text-5xl font-black text-purple-600 mb-2">{accounts.length}</p>
               <p className="text-gray-700 font-bold">Total Accounts Available</p>
             </div>
-            <div className="bg-gradient-to-br from-green-100 to-green-50 p-8 rounded-2xl text-center border-2 border-green-200 shadow-lg">
+            <div className="bg-linear-to-br from-green-100 to-green-50 p-8 rounded-2xl text-center border-2 border-green-200 shadow-lg">
               <p className="text-5xl font-black text-green-600 mb-2">{accounts.filter(a => a.is_hiring).length}</p>
               <p className="text-gray-700 font-bold">Actively Hiring Now</p>
             </div>
-            <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-8 rounded-2xl text-center border-2 border-blue-200 shadow-lg">
+            <div className="bg-linear-to-br from-blue-100 to-blue-50 p-8 rounded-2xl text-center border-2 border-blue-200 shadow-lg">
               <p className="text-5xl font-black text-blue-600 mb-2">
                 {accounts.reduce((sum, a) => sum + (a.available_slots || 0), 0).toLocaleString()}
               </p>
