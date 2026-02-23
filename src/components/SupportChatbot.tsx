@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { useChatbotOptions } from '@/hooks/useChatbotOptions';
+import { useSystemSettings } from '@/hooks/useSystemSettings';
 import styles from './SupportChatbot.module.css';
 
 interface Message {
@@ -11,21 +13,65 @@ interface Message {
   timestamp: Date;
 }
 
+interface CategoryGroup {
+  name: string;
+  icon: string;
+  items: any[];
+}
+
 export function SupportChatbot() {
+  const pathname = usePathname();
   const { options, loading } = useChatbotOptions();
+  const { getBooleanSetting, loading: settingsLoading, refresh } = useSystemSettings();
   const [isOpen, setIsOpen] = useState(false);
-  const [currentStep, setCurrentStep] = useState<'menu' | 'content' | 'admin-chat'>('menu');
+  const [currentStep, setCurrentStep] = useState<'menu' | 'category' | 'content' | 'admin-chat'>('menu');
   const [selectedOption, setSelectedOption] = useState<any>(null);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       type: 'bot',
-      content: "Welcome to Echoverse! I'm here to help you start your ESL teaching journey. What would you like to know?",
+      content: "How can I help? 👋",
       timestamp: new Date(),
     },
   ]);
   const [userMessage, setUserMessage] = useState('');
   const [adminChatting, setAdminChatting] = useState(false);
+  const [isChatbotEnabled, setIsChatbotEnabled] = useState(true);
+  const prevEnabledRef = useRef<boolean>(true);
+
+  // Check if on admin page
+  const isAdminPage = pathname.startsWith('/admin');
+
+  // Initialize chatbot enabled state - only on mount
+  useEffect(() => {
+    if (isAdminPage) {
+      setIsChatbotEnabled(false);
+      prevEnabledRef.current = false;
+    } else if (!settingsLoading) {
+      const chatbotEnabled = getBooleanSetting('chatbot_enabled');
+      setIsChatbotEnabled(chatbotEnabled);
+      prevEnabledRef.current = chatbotEnabled;
+    }
+  }, [isAdminPage, settingsLoading]);
+
+  // Group options by category for better organization
+  const groupedOptions = options.reduce((acc: { [key: string]: CategoryGroup }, option: any) => {
+    const category = option.category || 'General';
+    if (!acc[category]) {
+      acc[category] = {
+        name: category,
+        icon: option.emoji?.charAt(0) || '📋',
+        items: []
+      };
+    }
+    acc[category].items.push(option);
+    return acc;
+  }, {});
+
+  const handleCategoryClick = (categoryName: string) => {
+    setExpandedCategory(expandedCategory === categoryName ? null : categoryName);
+  };
 
   const handleOptionClick = (option: any) => {
     // Add user message
@@ -48,7 +94,7 @@ export function SupportChatbot() {
         id: (Date.now() + 1).toString(),
         type: 'bot',
         content:
-          'Connecting you to an admin... One of our team members will be with you shortly to help with your inquiry.',
+          'Connecting you to support... We\'ll assist you shortly.',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, botMessage]);
@@ -91,15 +137,22 @@ export function SupportChatbot() {
     setCurrentStep('menu');
     setAdminChatting(false);
     setSelectedOption(null);
-    setMessages([
-      {
-        id: Math.random().toString(),
-        type: 'bot',
-        content: "Let's start fresh! What can I help you with today?",
-        timestamp: new Date(),
-      },
-    ]);
   };
+
+  // Don't render chatbot if on admin page
+  if (isAdminPage) {
+    return null;
+  }
+
+  // Wait for settings to load before deciding whether to show chatbot
+  if (settingsLoading) {
+    return null;
+  }
+
+  // Hide chatbot if disabled (but keep component mounted to prevent flickering)
+  if (!isChatbotEnabled) {
+    return null;
+  }
 
   if (!isOpen) {
     return (
@@ -116,10 +169,7 @@ export function SupportChatbot() {
   return (
     <div className={styles.chatbotContainer}>
       <div className={styles.chatbotHeader}>
-        <div className={styles.headerContent}>
-          <h3>Echoverse Support</h3>
-          <p>Ask me anything! 👋</p>
-        </div>
+        <h3>Echoverse Support</h3>
         <button
           className={styles.closeButton}
           onClick={() => setIsOpen(false)}
@@ -141,20 +191,40 @@ export function SupportChatbot() {
       </div>
 
       {currentStep === 'menu' && !adminChatting && (
-        <div className={styles.optionsGrid}>
+        <div className={styles.compactMenu}>
           {loading ? (
-            <div className={styles.loading}>Loading options...</div>
+            <div className={styles.loading}>Loading...</div>
           ) : (
-            options.map((option) => (
-              <button
-                key={option.id}
-                className={styles.optionButton}
-                onClick={() => handleOptionClick(option)}
-              >
-                <span className={styles.emoji}>{option.emoji}</span>
-                <span className={styles.title}>{option.title}</span>
-              </button>
-            ))
+            <div className={styles.categoryList}>
+              {Object.entries(groupedOptions).map(([catName, category]: [string, any]) => (
+                <div key={catName} className={styles.categoryItem}>
+                  <button
+                    className={styles.categoryButton}
+                    onClick={() => handleCategoryClick(catName)}
+                  >
+                    <span className={styles.catIcon}>{category.icon}</span>
+                    <span className={styles.catName}>{catName}</span>
+                    <span className={styles.caretIcon}>
+                      {expandedCategory === catName ? '▼' : '▶'}
+                    </span>
+                  </button>
+                  {expandedCategory === catName && (
+                    <div className={styles.categoryOptions}>
+                      {category.items.map((option: any) => (
+                        <button
+                          key={option.id}
+                          className={styles.quickOptionButton}
+                          onClick={() => handleOptionClick(option)}
+                        >
+                          <span className={styles.optEmoji}>{option.emoji}</span>
+                          <span className={styles.optTitle}>{option.title}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}

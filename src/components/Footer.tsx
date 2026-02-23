@@ -6,95 +6,71 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-linear-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
+    <footer className="bg-linear-to-b from-slate-950 to-slate-900 text-white border-t border-purple-600/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Main Footer Content - Mobile optimized */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 py-12 sm:py-16 lg:py-20">
-          {/* Brand Section */}
-          <div className="sm:col-span-1">
-            <Link href="/" className="flex items-center space-x-2 group mb-4 sm:mb-6">
-              <div className="w-10 h-10 bg-linear-to-br from-purple-400 to-pink-400 rounded-xl flex items-center justify-center text-lg">🎓</div>
-              <span className="text-lg sm:text-xl font-bold">Echoverse</span>
-            </Link>
-            <p className="text-gray-300 text-xs sm:text-sm leading-relaxed mb-4 sm:mb-6">
-              Connecting ESL educators with international students for meaningful work and flexible income.
-            </p>
-            <div className="flex gap-3">
-              <a href="#" className="w-10 h-10 bg-purple-500/20 hover:bg-purple-500 rounded-lg flex items-center justify-center transition text-white text-xs font-bold min-h-10 min-w-10">f</a>
-              <a href="#" className="w-10 h-10 bg-purple-500/20 hover:bg-purple-500 rounded-lg flex items-center justify-center transition text-white text-xs font-bold min-h-10 min-w-10">𝕏</a>
-              <a href="#" className="w-10 h-10 bg-purple-500/20 hover:bg-purple-500 rounded-lg flex items-center justify-center transition text-white text-xs font-bold min-h-10 min-w-10">in</a>
+        {/* Compact Footer - Two Row Layout */}
+        <div className="py-8 sm:py-10">
+          {/* Top Row - Logo and Links */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-6 sm:gap-8 mb-6 sm:mb-8">
+            {/* Brand */}
+            <div className="sm:col-span-1">
+              <Link href="/" className="flex items-center space-x-2 group mb-3 hover:opacity-80 transition">
+                <div className="w-8 h-8 bg-linear-to-br from-purple-400 to-pink-400 rounded-lg flex items-center justify-center text-sm">🎓</div>
+                <span className="text-sm font-bold">Echoverse</span>
+              </Link>
+            </div>
+
+            {/* Quick Links - Compact */}
+            <div className="sm:col-span-1">
+              <h4 className="font-semibold text-xs uppercase tracking-wider text-gray-300 mb-2">Links</h4>
+              <ul className="space-y-1.5">
+                <li><Link href="/" className="text-gray-400 hover:text-white text-xs transition">Home</Link></li>
+                <li><Link href="/teachers-profile" className="text-gray-400 hover:text-white text-xs transition">Teach</Link></li>
+                <li><Link href="/about" className="text-gray-400 hover:text-white text-xs transition">About</Link></li>
+              </ul>
+            </div>
+
+            {/* Resources */}
+            <div className="sm:col-span-1">
+              <h4 className="font-semibold text-xs uppercase tracking-wider text-gray-300 mb-2">Help</h4>
+              <ul className="space-y-1.5">
+                <li><Link href="#faq" className="text-gray-400 hover:text-white text-xs transition">FAQ</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white text-xs transition">Contact</Link></li>
+                <li><Link href="#" className="text-gray-400 hover:text-white text-xs transition">Blog</Link></li>
+              </ul>
+            </div>
+
+            {/* Socials */}
+            <div className="sm:col-span-1">
+              <h4 className="font-semibold text-xs uppercase tracking-wider text-gray-300 mb-2">Follow</h4>
+              <div className="flex gap-2">
+                <a href="#" className="w-7 h-7 bg-purple-600/30 hover:bg-purple-600 rounded flex items-center justify-center text-xs transition" title="Facebook">f</a>
+                <a href="#" className="w-7 h-7 bg-purple-600/30 hover:bg-purple-600 rounded flex items-center justify-center text-xs transition" title="Twitter">𝕏</a>
+                <a href="#" className="w-7 h-7 bg-purple-600/30 hover:bg-purple-600 rounded flex items-center justify-center text-xs transition" title="LinkedIn">in</a>
+              </div>
+            </div>
+
+            {/* Newsletter - Compact */}
+            <div>
+              <h4 className="font-semibold text-xs uppercase tracking-wider text-gray-300 mb-2">Updates</h4>
+              <div className="flex gap-1">
+                <input
+                  type="email"
+                  placeholder="Email"
+                  className="flex-1 px-2 py-1.5 rounded text-gray-900 text-xs focus:outline-none"
+                />
+                <button className="px-2 py-1.5 bg-linear-to-r from-purple-600 to-pink-600 hover:opacity-90 rounded font-semibold transition text-xs">→</button>
+              </div>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="font-bold text-base sm:text-lg mb-4 sm:mb-6">Quick Links</h3>
-            <ul className="space-y-2.5 sm:space-y-3">
-              {[
-                { label: 'Home', href: '/' },
-                { label: 'Teachers Profile', href: '/teachers-profile' },
-                { label: 'About Us', href: '/about' },
-                { label: 'Contact', href: '/contact' },
-              ].map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base py-1 min-h-10 flex items-center">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h3 className="font-bold text-base sm:text-lg mb-4 sm:mb-6">Resources</h3>
-            <ul className="space-y-2.5 sm:space-y-3">
-              {[
-                { label: 'FAQ', href: '#faq' },
-                { label: 'Teaching Tips', href: '#' },
-                { label: 'Student Reviews', href: '#' },
-                { label: 'Blog', href: '#' },
-              ].map((link) => (
-                <li key={link.label}>
-                  <Link href={link.href} className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base py-1 min-h-10 flex items-center">
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Newsletter - Mobile optimized */}
-          <div className="sm:col-span-2 md:col-span-1">
-            <h3 className="font-bold text-base sm:text-lg mb-3 sm:mb-6">Stay Updated</h3>
-            <p className="text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4">
-              Subscribe for the latest teaching opportunities and updates.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-2">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="flex-1 px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg sm:rounded-l-lg text-gray-900 focus:outline-none text-sm min-h-10"
-              />
-              <button className="px-4 py-2.5 sm:py-2 bg-linear-to-r from-purple-600 to-pink-600 hover:opacity-90 rounded-lg sm:rounded-r-lg font-semibold transition min-h-10 w-full sm:w-auto flex items-center justify-center">
-                →
-              </button>
+          {/* Bottom Row - Copyright */}
+          <div className="border-t border-purple-600/10 pt-4 sm:pt-6 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-gray-400">
+            <p>© {currentYear} Echoverse. Made with ❤️ for educators</p>
+            <div className="flex gap-4 sm:gap-6">
+              <Link href="#" className="hover:text-white transition">Privacy</Link>
+              <Link href="#" className="hover:text-white transition">Terms</Link>
             </div>
-          </div>
-        </div>
-
-        {/* Bottom Section - Mobile optimized */}
-        <div className="border-t border-purple-500/20 py-6 sm:py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-gray-400 text-xs sm:text-sm text-center sm:text-left">
-            © {currentYear} Echoverse. All rights reserved. | Made with ❤️ for educators
-          </p>
-          <div className="flex gap-6 sm:gap-8">
-            <Link href="#" className="text-gray-400 hover:text-white text-xs sm:text-sm transition py-1 px-2 min-h-10 flex items-center">
-              Privacy Policy
-            </Link>
-            <Link href="#" className="text-gray-400 hover:text-white text-xs sm:text-sm transition py-1 px-2 min-h-10 flex items-center">
-              Terms of Service
-            </Link>
           </div>
         </div>
       </div>

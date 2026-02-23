@@ -17,12 +17,14 @@ const AUTH_STORAGE_KEY = 'echoverse_admin_token';
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     // Check for existing authentication on mount
     const token = localStorage.getItem(AUTH_STORAGE_KEY);
     setIsAdmin(!!token);
     setIsLoading(false);
+    setIsMounted(true);
   }, []);
 
   const login = useCallback((password: string): boolean => {
@@ -41,7 +43,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <AuthContext.Provider value={{ isAdmin, login, logout, isLoading }}>
-      {children}
+      <div suppressHydrationWarning>
+        {children}
+      </div>
     </AuthContext.Provider>
   );
 };

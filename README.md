@@ -2,8 +2,24 @@
 
 A modern, responsive website for Echoverse Tutorial Online Services - an online learning platform offering expert-led courses in various fields.
 
+## 📋 Recent Updates & Bug Fixes
+
+### Latest Changes (February 23, 2026)
+
+#### 🐛 Bug Fixes
+- **Fixed Support Chatbot Disappearing Issue** - Resolved the "ghost" chatbot that was disappearing and reappearing constantly
+  - Removed aggressive 3-second refresh polling that was causing component remounting
+  - Simplified state management for stability
+  - Added GPU acceleration with `will-change` CSS property
+  - Chatbot now maintains stable visibility and only updates based on actual settings changes
+
+#### ✨ Improvements
+- Enhanced component stability to prevent unnecessary re-renders
+- Optimized rendering performance with better animation handling
+
 ## Features
 
+- **Support Chatbot**: AI-powered support chatbot widget with categorized help options and admin chat integration
 - **Homepage**: Beautiful landing page with hero section, features showcase, and call-to-action
 - **Courses Page**: Comprehensive course catalog with filtering options
 - **Pricing Page**: Multiple subscription tiers with feature comparison
@@ -76,7 +92,30 @@ src/
 │   │   └── page.tsx       # Login page
 │   └── signup/
 │       └── page.tsx       # Sign up page
+├── components/
+│   ├── SupportChatbot.tsx          # AI-powered support chatbot
+│   ├── SupportChatbot.module.css   # Chatbot styling
+│   └── [other components]
+├── hooks/
+│   ├── useChatbotOptions.ts        # Custom hook for chatbot data
+│   └── [other hooks]
+└── lib/
+    ├── auth-context.tsx            # Authentication context
+    └── supabase.ts                 # Supabase client setup
 ```
+
+## Key Components
+
+### Support Chatbot
+- **File**: [src/components/SupportChatbot.tsx](src/components/SupportChatbot.tsx)
+- **Features**:
+  - Categorized help options with expandable menus
+  - Dynamic chatbot options from database
+  - Admin chat integration for direct support
+  - Responsive design with toggle button
+  - Customizable via system settings
+  - Persistent across page navigation
+- **Status**: ✅ Fully functional with latest stability improvements
 
 ## Pages
 
@@ -182,6 +221,8 @@ npm run start
 - Email notifications
 - Video course player
 - Certificate generation
+- Multi-language support
+- Mobile app (iOS/Android)
 
 ## License
 
