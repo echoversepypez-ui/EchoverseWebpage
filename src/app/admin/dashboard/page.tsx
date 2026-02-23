@@ -109,6 +109,7 @@ export default function AdminDashboardPage() {
     { name: 'Teaching Accounts', href: '/admin/teaching-accounts', icon: '🏢' },
     { name: 'Applications', href: '/admin/applications', icon: '📋' },
     { name: 'Messages', href: '/admin/contacts', icon: '💬' },
+    { name: 'Support Chat', href: '/admin/support-conversations', icon: '💻' },
     { name: 'Page Content', href: '/admin/page-content', icon: '📝' },
     { name: 'Chatbot', href: '/admin/chatbot-options', icon: '🤖' },
     { name: 'Settings', href: '/admin/settings', icon: '⚙️' },

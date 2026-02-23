@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useJourneySteps } from '@/hooks/useProfileManagement';
+import { usePageSections } from '@/hooks/usePageSections';
 import { RequirementsSection } from '@/components/RequirementsSection';
 import { FAQSection } from '@/components/FAQSection';
 import { WhyJoinSection } from '@/components/WhyJoinSection';
@@ -13,6 +14,7 @@ import { Footer } from '@/components/Footer';
 
 export default function Home() {
   const journeySteps = useJourneySteps();
+  const { sections: pageSections, loading: sectionsLoading } = usePageSections();
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [applicationLoading, setApplicationLoading] = useState(false);
   const [applicationData, setApplicationData] = useState({
@@ -33,6 +35,25 @@ export default function Home() {
     residing_antique: '',
     agreed_to_terms: false,
   });
+
+  // Listen for custom event from chatbot to open application modal
+  useEffect(() => {
+    const handleOpenApplicationModal = () => {
+      setShowApplicationModal(true);
+      // Scroll to the modal
+      setTimeout(() => {
+        const modal = document.querySelector('[role="dialog"]');
+        if (modal) {
+          modal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
+    };
+
+    window.addEventListener('openApplicationModal', handleOpenApplicationModal);
+    return () => {
+      window.removeEventListener('openApplicationModal', handleOpenApplicationModal);
+    };
+  }, []);
 
   const handleApplicationInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -151,33 +172,84 @@ export default function Home() {
           </div>
 
           {/* Quick Facts Strip */}
-          <div className="bg-linear-to-r from-purple-600 to-pink-600 rounded-2xl p-8 sm:p-12 text-white">
-            <h3 className="text-2xl font-bold mb-8 text-center">Why Thousands Love Teaching With Us 💜</h3>
+          <div className="bg-linear-to-br from-purple-600 via-purple-500 to-pink-600 rounded-3xl p-12 sm:p-16 text-white shadow-2xl transform hover:shadow-3xl transition-all duration-300 relative overflow-hidden">
+            {/* Decorative background */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-40 -mt-40"></div>
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/5 rounded-full -ml-32 -mb-32"></div>
             
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-black mb-2">⚡</div>
-                <p className="font-semibold mb-1">Fast Setup</p>
-                <p className="text-sm opacity-90">Get started in 3-5 days</p>
-              </div>
+            <div className="relative z-10">
+              <h3 className="text-4xl sm:text-5xl font-black mb-3 text-center">Why Thousands Love Teaching With Us 💜</h3>
+              <p className="text-center text-white/80 mb-12 text-lg max-w-2xl mx-auto">Join our thriving community of educators and unlock unlimited potential</p>
               
-              <div className="text-center">
-                <div className="text-3xl font-black mb-2">🌍</div>
-                <p className="font-semibold mb-1">Global Students</p>
-                <p className="text-sm opacity-90">Teach learners worldwide</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-3xl font-black mb-2">💰</div>
-                <p className="font-semibold mb-1">Competitive Pay</p>
-                <p className="text-sm opacity-90">$15-35+ per hour</p>
-              </div>
-              
-              <div className="text-center">
-                <div className="text-3xl font-black mb-2">🤝</div>
-                <p className="font-semibold mb-1">Full Support</p>
-                <p className="text-sm opacity-90">24/7 help available</p>
-              </div>
+              {sectionsLoading ? (
+                <div className="text-center py-8">
+                  <p className="opacity-90 text-lg">Loading benefits...</p>
+                </div>
+              ) : (
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {pageSections
+                    .find((s) => s.section_name === 'why_join')
+                    ?.content?.benefits?.map((benefit: any, index: number) => (
+                      <div 
+                        key={index} 
+                        className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60"
+                      >
+                        {/* Icon container */}
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                          <div className="text-5xl">{benefit.icon}</div>
+                        </div>
+                        
+                        <h4 className="text-xl font-bold mb-4 leading-tight group-hover:text-white transition-colors">{benefit.title}</h4>
+                        <p className="text-base leading-relaxed text-white/90 group-hover:text-white transition-colors">{benefit.description}</p>
+                        
+                        {/* Decorative hover effect */}
+                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/0 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </div>
+                    )) || (
+                    <>
+                      <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                          <div className="text-5xl">💰</div>
+                        </div>
+                        <h4 className="text-xl font-bold mb-4">Competitive Pay</h4>
+                        <p className="text-base leading-relaxed text-white/90">Earn $15-25+ per hour with rates based on your experience and qualifications</p>
+                      </div>
+                      
+                      <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                          <div className="text-5xl">⏰</div>
+                        </div>
+                        <h4 className="text-xl font-bold mb-4">Flexible Schedule</h4>
+                        <p className="text-base leading-relaxed text-white/90">Work on your terms. Choose your hours and the number of students you teach</p>
+                      </div>
+                      
+                      <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                          <div className="text-5xl">🌍</div>
+                        </div>
+                        <h4 className="text-xl font-bold mb-4">Global Students</h4>
+                        <p className="text-base leading-relaxed text-white/90">Teach learners from Japan, Korea, China, Thailand, Vietnam and beyond</p>
+                      </div>
+                      
+                      <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                          <div className="text-5xl">👥</div>
+                        </div>
+                        <h4 className="text-xl font-bold mb-4">24/7 Support</h4>
+                        <p className="text-base leading-relaxed text-white/90">Our dedicated team is always ready to help you succeed</p>
+                      </div>
+                      
+                      <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                          <div className="text-5xl">📈</div>
+                        </div>
+                        <h4 className="text-xl font-bold mb-4">Career Growth</h4>
+                        <p className="text-base leading-relaxed text-white/90">Access multiple teaching opportunities and advance your career</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -254,40 +326,68 @@ export default function Home() {
             <div className="w-24 h-1 bg-linear-to-r from-purple-600 to-pink-600 mx-auto rounded-full"></div>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="p-8 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group">
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => <span key={i} className="text-2xl">⭐</span>)}
-              </div>
-              <p className="text-gray-700 leading-relaxed mb-6 italic">{`"Echoverse changed my life! I went from freelance tutoring to earning $5k/month. The flexibility is unmatched and the support is amazing."`}</p>
-              <div className="border-t-2 border-gray-200 pt-4">
-                <p className="font-bold text-gray-900">Maria Santos</p>
-                <p className="text-purple-600 font-semibold">Full-time Teacher • 6 months in</p>
-              </div>
+          {sectionsLoading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Loading testimonials...</p>
             </div>
-            
-            <div className="p-8 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group">
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => <span key={i} className="text-2xl">⭐</span>)}
-              </div>
-              <p className="text-gray-700 leading-relaxed mb-6 italic">{`"I started as a side hustle and got my first student within 48 hours. The platform is so easy to use and students are genuinely engaged."`}</p>
-              <div className="border-t-2 border-gray-200 pt-4">
-                <p className="font-bold text-gray-900">John Smith</p>
-                <p className="text-purple-600 font-semibold">Part-time Educator • 3 months in</p>
-              </div>
-            </div>
-            
-            <div className="p-8 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group">
-              <div className="flex items-center gap-1 mb-4">
-                {[...Array(5)].map((_, i) => <span key={i} className="text-2xl">⭐</span>)}
-              </div>
-              <p className="text-gray-700 leading-relaxed mb-6 italic">{`"Teaching 20+ hours a week with complete flexibility. Students from all over the world. This is exactly what I was looking for!"`}</p>
-              <div className="border-t-2 border-gray-200 pt-4">
-                <p className="font-bold text-gray-900">Sarah Johnson</p>
-                <p className="text-purple-600 font-semibold">Career Switcher • 9 months in</p>
-              </div>
-            </div>
-          </div>
+          ) : (
+            <>
+              {pageSections.find((s) => s.section_name === 'testimonials')?.content?.testimonials && 
+               pageSections.find((s) => s.section_name === 'testimonials')?.content?.testimonials.length > 0 ? (
+                <div className="grid md:grid-cols-3 gap-8">
+                  {pageSections
+                    .find((s) => s.section_name === 'testimonials')
+                    ?.content?.testimonials?.map((testimonial: any, index: number) => (
+                      <div key={index} className="p-8 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group">
+                        <div className="flex items-center gap-1 mb-4">
+                          {[...Array(testimonial.rating || 5)].map((_, i) => <span key={i} className="text-2xl">⭐</span>)}
+                        </div>
+                        <p className="text-gray-700 leading-relaxed mb-6 italic">{`"${testimonial.quote}"`}</p>
+                        <div className="border-t-2 border-gray-200 pt-4">
+                          <p className="font-bold text-gray-900">{testimonial.name}</p>
+                          <p className="text-purple-600 font-semibold">{testimonial.role} • {testimonial.duration}</p>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-3 gap-8">
+                  <div className="p-8 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group">
+                    <div className="flex items-center gap-1 mb-4">
+                      {[...Array(5)].map((_, i) => <span key={i} className="text-2xl">⭐</span>)}
+                    </div>
+                    <p className="text-gray-700 leading-relaxed mb-6 italic">{`"Echoverse changed my life! I went from freelance tutoring to earning $5k/month. The flexibility is unmatched and the support is amazing."`}</p>
+                    <div className="border-t-2 border-gray-200 pt-4">
+                      <p className="font-bold text-gray-900">Maria Santos</p>
+                      <p className="text-purple-600 font-semibold">Full-time Teacher • 6 months in</p>
+                    </div>
+                  </div>
+                  
+                  <div className="p-8 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group">
+                    <div className="flex items-center gap-1 mb-4">
+                      {[...Array(5)].map((_, i) => <span key={i} className="text-2xl">⭐</span>)}
+                    </div>
+                    <p className="text-gray-700 leading-relaxed mb-6 italic">{`"I started as a side hustle and got my first student within 48 hours. The platform is so easy to use and students are genuinely engaged."`}</p>
+                    <div className="border-t-2 border-gray-200 pt-4">
+                      <p className="font-bold text-gray-900">John Smith</p>
+                      <p className="text-purple-600 font-semibold">Part-time Educator • 3 months in</p>
+                    </div>
+                  </div>
+                  
+                  <div className="p-8 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group">
+                    <div className="flex items-center gap-1 mb-4">
+                      {[...Array(5)].map((_, i) => <span key={i} className="text-2xl">⭐</span>)}
+                    </div>
+                    <p className="text-gray-700 leading-relaxed mb-6 italic">{`"Teaching 20+ hours a week with complete flexibility. Students from all over the world. This is exactly what I was looking for!"`}</p>
+                    <div className="border-t-2 border-gray-200 pt-4">
+                      <p className="font-bold text-gray-900">Sarah Johnson</p>
+                      <p className="text-purple-600 font-semibold">Career Switcher • 9 months in</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </section>
 

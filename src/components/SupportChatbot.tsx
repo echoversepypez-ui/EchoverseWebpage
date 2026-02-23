@@ -4,13 +4,17 @@ import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useChatbotOptions } from '@/hooks/useChatbotOptions';
 import { useSystemSettings } from '@/hooks/useSystemSettings';
+import { useAdminConversations } from '@/hooks/useAdminConversations';
+import { useConversationMessages } from '@/hooks/useConversationMessages';
+import { supabase } from '@/lib/supabase';
 import styles from './SupportChatbot.module.css';
 
 interface Message {
   id: string;
-  type: 'bot' | 'user';
+  type: 'bot' | 'user' | 'system';
   content: string;
   timestamp: Date;
+  senderName?: string;
 }
 
 interface CategoryGroup {
@@ -23,11 +27,14 @@ export function SupportChatbot() {
   const pathname = usePathname();
   const { options, loading } = useChatbotOptions();
   const { getBooleanSetting, loading: settingsLoading, refresh } = useSystemSettings();
+  const { createConversation } = useAdminConversations();
+  
+  // State
   const [isOpen, setIsOpen] = useState(false);
-  const [currentStep, setCurrentStep] = useState<'menu' | 'category' | 'content' | 'admin-chat'>('menu');
+  const [currentStep, setCurrentStep] = useState<'menu' | 'category' | 'content' | 'guest-info' | 'admin-chat'>('menu');
   const [selectedOption, setSelectedOption] = useState<any>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([
+  const [localMessages, setLocalMessages] = useState<Message[]>([
     {
       id: '1',
       type: 'bot',
@@ -36,12 +43,38 @@ export function SupportChatbot() {
     },
   ]);
   const [userMessage, setUserMessage] = useState('');
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
   const [adminChatting, setAdminChatting] = useState(false);
   const [isChatbotEnabled, setIsChatbotEnabled] = useState(true);
+  const [guestId, setGuestId] = useState<string | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  
+  // Hook for conversation messages - will subscribe when conversationId is set
+  const { messages: dbMessages, loading: messagesLoading } = useConversationMessages(conversationId);
+  const [isCreatingConversation, setIsCreatingConversation] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [showFallback, setShowFallback] = useState(false);
+  
   const prevEnabledRef = useRef<boolean>(true);
+  const guestIdRef = useRef<string | null>(null);
 
   // Check if on admin page
   const isAdminPage = pathname.startsWith('/admin');
+
+  // Initialize guest ID on mount
+  useEffect(() => {
+    const storedGuestId = localStorage.getItem('chatbot_guest_id');
+    if (storedGuestId) {
+      setGuestId(storedGuestId);
+      guestIdRef.current = storedGuestId;
+    } else {
+      const newGuestId = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem('chatbot_guest_id', newGuestId);
+      setGuestId(newGuestId);
+      guestIdRef.current = newGuestId;
+    }
+  }, []);
 
   // Initialize chatbot enabled state - only on mount
   useEffect(() => {
@@ -69,6 +102,24 @@ export function SupportChatbot() {
     return acc;
   }, {});
 
+  // Get combined display messages (local bot/system messages + active conversation messages)
+  const getDisplayMessages = (): Message[] => {
+    if (!adminChatting || !conversationId) {
+      return localMessages;
+    }
+    // When in admin chat, show all conversation messages from database
+    // These include both guest and admin messages with their actual names
+    const convertedMessages = dbMessages.map((msg) => ({
+      id: msg.id,
+      type: msg.sender_type as 'bot' | 'user' | 'system',
+      content: msg.message,
+      timestamp: new Date(msg.created_at),
+      senderName: msg.sender_name || 'Unknown', // Include the actual sender name
+    }));
+    
+    return convertedMessages;
+  };
+
   const handleCategoryClick = (categoryName: string) => {
     setExpandedCategory(expandedCategory === categoryName ? null : categoryName);
   };
@@ -82,22 +133,14 @@ export function SupportChatbot() {
       timestamp: new Date(),
     };
 
-    setMessages((prev) => [...prev, newMessage]);
+    setLocalMessages((prev) => [...prev, newMessage]);
 
     if (option.is_admin_chat) {
-      // Switch to admin chat mode
-      setCurrentStep('admin-chat');
-      setAdminChatting(true);
+      // Show guest info form before creating conversation
+      setCurrentStep('guest-info');
       setSelectedOption(option);
-      
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        type: 'bot',
-        content:
-          'Connecting you to support... We\'ll assist you shortly.',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botMessage]);
+      setGuestName('');
+      setGuestEmail('');
     } else {
       // Show detailed content
       setCurrentStep('content');
@@ -105,31 +148,119 @@ export function SupportChatbot() {
     }
   };
 
-  const handleSendMessage = () => {
+  const handleGuestInfoSubmit = async () => {
+    if (!guestName.trim()) {
+      alert('Please enter your name');
+      return;
+    }
+
+    if (!guestId) {
+      alert('Unable to establish connection. Please try again.');
+      return;
+    }
+
+    try {
+      setIsCreatingConversation(true);
+      setShowFallback(false);
+      
+      console.log('[Chat] Creating conversation with guest info:', { guestId, guestName, guestEmail });
+      
+      const conversation = await createConversation(guestId, guestEmail || undefined, guestName);
+      
+      if (conversation && conversation.id) {
+        console.log('[Chat] Conversation created successfully:', conversation.id);
+        setConversationId(conversation.id);
+        setIsCreatingConversation(false);
+        setRetryCount(0);
+        setShowFallback(false);
+        setCurrentStep('admin-chat');
+        setAdminChatting(true);
+      } else {
+        throw new Error('Invalid conversation response - no ID returned');
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error('[Chat] Failed to create conversation:', errorMsg, error);
+      setIsCreatingConversation(false);
+      setShowFallback(true);
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'system',
+        content: `⚠️ Connection error: ${errorMsg}. Please try email support instead.`,
+        timestamp: new Date(),
+      };
+      setLocalMessages((prev) => [...prev, errorMessage]);
+    }
+  };
+
+  const handleSendMessage = async () => {
     if (!userMessage.trim()) return;
+    
+    if (!conversationId) {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'system',
+        content: '⚠️ Still connecting to support. Please wait a moment and try again.',
+        timestamp: new Date(),
+      };
+      setLocalMessages((prev) => [...prev, errorMessage]);
+      return;
+    }
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      type: 'user',
-      content: userMessage,
-      timestamp: new Date(),
-    };
+    if (!guestId) {
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'system',
+        content: '❌ Unable to establish connection. Please refresh and try again.',
+        timestamp: new Date(),
+      };
+      setLocalMessages((prev) => [...prev, errorMessage]);
+      return;
+    }
 
-    setMessages((prev) => [...prev, newMessage]);
+    const messageContent = userMessage;
     setUserMessage('');
 
-    // Simulate admin response
-    if (adminChatting) {
-      setTimeout(() => {
-        const adminResponse: Message = {
+    try {
+      // Save message to database
+      console.log('[Chat] Sending message with conversationId:', conversationId, 'guestId:', guestId);
+      
+      const { error } = await supabase
+        .from('conversation_messages')
+        .insert([
+          {
+            conversation_id: conversationId,
+            sender_type: 'guest',
+            sender_id: guestId,
+            sender_name: guestName || 'Guest',
+            message: messageContent,
+            is_read: false,
+          },
+        ]);
+
+      if (error) {
+        console.error('[Chat] Error saving message:', error.code, error.message, error);
+        const errorMessage: Message = {
           id: (Date.now() + 1).toString(),
-          type: 'bot',
-          content:
-            'Thank you for your message. An admin will review this and get back to you as soon as possible. Is there anything else I can help you with?',
+          type: 'system',
+          content: `❌ Error: ${error.message || 'Failed to send message. Please try again.'}`,
           timestamp: new Date(),
         };
-        setMessages((prev) => [...prev, adminResponse]);
-      }, 500);
+        setLocalMessages((prev) => [...prev, errorMessage]);
+      } else {
+        console.log('[Chat] Message sent successfully - will appear via real-time update');
+      }
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      console.error('[Chat] Error sending message:', errorMsg, err);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'system',
+        content: `❌ Error: ${errorMsg || 'Failed to send message. Please try again.'}`,
+        timestamp: new Date(),
+      };
+      setLocalMessages((prev) => [...prev, errorMessage]);
     }
   };
 
@@ -180,12 +311,17 @@ export function SupportChatbot() {
       </div>
 
       <div className={styles.chatbotMessages}>
-        {messages.map((message) => (
+        {getDisplayMessages().map((message) => (
           <div
             key={message.id}
             className={`${styles.message} ${styles[message.type]}`}
           >
-            {message.content}
+            {message.senderName && message.type !== 'bot' && (
+              <div className={styles.senderName}>
+                {message.senderName}
+              </div>
+            )}
+            <div className={styles.messageContent}>{message.content}</div>
           </div>
         ))}
       </div>
@@ -195,36 +331,76 @@ export function SupportChatbot() {
           {loading ? (
             <div className={styles.loading}>Loading...</div>
           ) : (
-            <div className={styles.categoryList}>
-              {Object.entries(groupedOptions).map(([catName, category]: [string, any]) => (
-                <div key={catName} className={styles.categoryItem}>
+            <>
+              {showFallback && (
+                <div className={styles.fallbackSection}>
+                  <p className={styles.fallbackTitle}>Unable to connect to live chat</p>
                   <button
-                    className={styles.categoryButton}
-                    onClick={() => handleCategoryClick(catName)}
+                    className={styles.fallbackBtn}
+                    onClick={() => {
+                      setRetryCount(0);
+                      setShowFallback(false);
+                      // Re-trigger the chat with admin
+                      const adminChatOption = Object.values(groupedOptions)
+                        .flatMap((cat: any) => cat.items)
+                        .find((opt: any) => opt.is_admin_chat);
+                      if (adminChatOption) {
+                        handleOptionClick(adminChatOption);
+                      }
+                    }}
                   >
-                    <span className={styles.catIcon}>{category.icon}</span>
-                    <span className={styles.catName}>{catName}</span>
-                    <span className={styles.caretIcon}>
-                      {expandedCategory === catName ? '▼' : '▶'}
-                    </span>
+                    🔄 Retry Live Chat
                   </button>
-                  {expandedCategory === catName && (
-                    <div className={styles.categoryOptions}>
-                      {category.items.map((option: any) => (
-                        <button
-                          key={option.id}
-                          className={styles.quickOptionButton}
-                          onClick={() => handleOptionClick(option)}
-                        >
-                          <span className={styles.optEmoji}>{option.emoji}</span>
-                          <span className={styles.optTitle}>{option.title}</span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  <button
+                    className={styles.fallbackBtn}
+                    onClick={() => {
+                      window.location.href = '/contact';
+                    }}
+                  >
+                    📧 Email Support
+                  </button>
+                  <button
+                    className={styles.fallbackBtn}
+                    onClick={() => {
+                      setShowFallback(false);
+                      setCurrentStep('menu');
+                    }}
+                  >
+                    📋 Back to FAQ
+                  </button>
                 </div>
-              ))}
-            </div>
+              )}
+              <div className={styles.categoryList}>
+                {Object.entries(groupedOptions).map(([catName, category]: [string, any]) => (
+                  <div key={catName} className={styles.categoryItem}>
+                    <button
+                      className={styles.categoryButton}
+                      onClick={() => handleCategoryClick(catName)}
+                    >
+                      <span className={styles.catIcon}>{category.icon}</span>
+                      <span className={styles.catName}>{catName}</span>
+                      <span className={styles.caretIcon}>
+                        {expandedCategory === catName ? '▼' : '▶'}
+                      </span>
+                    </button>
+                    {expandedCategory === catName && (
+                      <div className={styles.categoryOptions}>
+                        {category.items.map((option: any) => (
+                          <button
+                            key={option.id}
+                            className={styles.quickOptionButton}
+                            onClick={() => handleOptionClick(option)}
+                          >
+                            <span className={styles.optEmoji}>{option.emoji}</span>
+                            <span className={styles.optTitle}>{option.title}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </div>
       )}
@@ -257,16 +433,105 @@ export function SupportChatbot() {
             )}
           </div>
 
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {selectedOption.title === 'Application' && (
+              <button
+                className={styles.actionButton}
+                onClick={() => {
+                  // Dispatch a custom event to open the application modal
+                  window.dispatchEvent(new CustomEvent('openApplicationModal'));
+                  setIsOpen(false);
+                }}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: '#ec4899',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#be185d'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ec4899'}
+              >
+                📋 Fill Out Application Now
+              </button>
+            )}
+            <button
+              className={styles.backButton}
+              onClick={handleGoBack}
+            >
+              ← Back to Menu
+            </button>
+          </div>
+        </div>
+      )}
+
+      {currentStep === 'guest-info' && (
+        <div className={styles.guestInfoContainer}>
+          <div className={styles.guestInfoHeader}>
+            <h3>Let us know who you are</h3>
+            <p>Please provide your details so our team can assist you better</p>
+          </div>
+
+          <div className={styles.guestInfoForm}>
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Full Name *</label>
+              <input
+                type="text"
+                className={styles.formInput}
+                placeholder="Enter your full name"
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !isCreatingConversation) {
+                    handleGuestInfoSubmit();
+                  }
+                }}
+                disabled={isCreatingConversation}
+                autoFocus
+              />
+            </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Email (Optional)</label>
+              <input
+                type="email"
+                className={styles.formInput}
+                placeholder="Enter your email"
+                value={guestEmail}
+                onChange={(e) => setGuestEmail(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !isCreatingConversation) {
+                    handleGuestInfoSubmit();
+                  }
+                }}
+                disabled={isCreatingConversation}
+              />
+            </div>
+
+            <button
+              className={styles.submitButton}
+              onClick={handleGuestInfoSubmit}
+              disabled={isCreatingConversation || !guestName.trim()}
+            >
+              {isCreatingConversation ? '⏳ Connecting...' : 'Start Chat'}
+            </button>
+          </div>
+
           <button
             className={styles.backButton}
             onClick={handleGoBack}
+            disabled={isCreatingConversation}
           >
             ← Back to Menu
           </button>
         </div>
       )}
 
-      {currentStep === 'admin-chat' && adminChatting && (
+      {currentStep === 'admin-chat' && (
         <div className={styles.inputContainer}>
           <div className={styles.inputGroup}>
             <input
@@ -276,21 +541,26 @@ export function SupportChatbot() {
               value={userMessage}
               onChange={(e) => setUserMessage(e.target.value)}
               onKeyPress={(e) => {
-                if (e.key === 'Enter') {
+                if (e.key === 'Enter' && !isCreatingConversation) {
                   handleSendMessage();
                 }
               }}
+              disabled={isCreatingConversation || !conversationId}
+              autoFocus
             />
             <button
               className={styles.sendButton}
               onClick={handleSendMessage}
+              disabled={isCreatingConversation || !userMessage.trim() || !conversationId}
+              title={!conversationId ? "Connecting to support..." : "Send message"}
             >
-              Send
+              {isCreatingConversation ? '⏳' : 'Send'}
             </button>
           </div>
           <button
             className={styles.backButton}
             onClick={handleGoBack}
+            disabled={isCreatingConversation}
           >
             ← Back to Menu
           </button>
