@@ -6,6 +6,7 @@ import { useChatbotOptions } from '@/hooks/useChatbotOptions';
 import { useSystemSettings } from '@/hooks/useSystemSettings';
 import { useAdminConversations } from '@/hooks/useAdminConversations';
 import { useConversationMessages } from '@/hooks/useConversationMessages';
+import { useHubSpotChat, openHubSpotWidget } from '@/hooks/useHubSpotChat';
 import { supabase } from '@/lib/supabase';
 import styles from './SupportChatbot.module.css';
 
@@ -29,6 +30,9 @@ export function SupportChatbot() {
   const { getBooleanSetting, loading: settingsLoading, refresh } = useSystemSettings();
   const { createConversation } = useAdminConversations();
   
+  // Initialize HubSpot chat
+  useHubSpotChat();
+  
   // State
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState<'menu' | 'category' | 'content' | 'guest-info' | 'admin-chat'>('menu');
@@ -49,6 +53,7 @@ export function SupportChatbot() {
   const [isChatbotEnabled, setIsChatbotEnabled] = useState(true);
   const [guestId, setGuestId] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [openingHubSpot, setOpeningHubSpot] = useState(false);
   
   // Hook for conversation messages - will subscribe when conversationId is set
   const { messages: dbMessages, loading: messagesLoading } = useConversationMessages(conversationId);
@@ -270,6 +275,13 @@ export function SupportChatbot() {
     setSelectedOption(null);
   };
 
+  const openHubSpotChat = () => {
+    setOpeningHubSpot(true);
+    openHubSpotWidget();
+    setIsOpen(false);
+    setOpeningHubSpot(false);
+  };
+
   // Don't render chatbot if on admin page
   if (isAdminPage) {
     return null;
@@ -332,6 +344,41 @@ export function SupportChatbot() {
             <div className={styles.loading}>Loading...</div>
           ) : (
             <>
+              {/* HubSpot Quick Chat Button */}
+              <button
+                className={styles.hubspotButton}
+                onClick={openHubSpotChat}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  marginBottom: '12px',
+                  backgroundColor: '#ff5733',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#e63d1d';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 87, 51, 0.3)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#ff5733';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <span>🟢 Quick Chat with Support</span>
+              </button>
+
               {showFallback && (
                 <div className={styles.fallbackSection}>
                   <p className={styles.fallbackTitle}>Unable to connect to live chat</p>

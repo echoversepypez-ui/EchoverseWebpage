@@ -11,12 +11,20 @@ import { WhyJoinSection } from '@/components/WhyJoinSection';
 import { AccountsAvailableSection } from '@/components/AccountsAvailableSection';
 import { TableOfContents } from '@/components/SectionNavigation';
 import { Footer } from '@/components/Footer';
+import { TestimonialCarousel, type Testimonial } from '@/components/TestimonialCarousel';
+
+interface Benefit {
+  icon: string;
+  title: string;
+  description: string;
+}
 
 export default function Home() {
   const journeySteps = useJourneySteps();
   const { sections: pageSections, loading: sectionsLoading } = usePageSections();
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [applicationLoading, setApplicationLoading] = useState(false);
+  const [visibleTestimonials, setVisibleTestimonials] = useState(6);
   const [applicationData, setApplicationData] = useState({
     name: '',
     age: '',
@@ -170,101 +178,105 @@ export default function Home() {
               </p>
             </div>
           </div>
+        </div>
 
-          {/* Quick Facts Strip */}
-          <div className="bg-linear-to-br from-purple-600 via-purple-500 to-pink-600 rounded-3xl p-12 sm:p-16 text-white shadow-2xl transform hover:shadow-3xl transition-all duration-300 relative overflow-hidden">
-            {/* Decorative background */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-40 -mt-40"></div>
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/5 rounded-full -ml-32 -mb-32"></div>
+        {/* Quick Facts Strip */}
+        <div className="bg-linear-to-br from-purple-600 via-purple-500 to-pink-600 rounded-3xl p-12 sm:p-16 text-white shadow-2xl transform hover:shadow-3xl transition-all duration-300 relative overflow-hidden">
+          {/* Decorative background */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-40 -mt-40"></div>
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/5 rounded-full -ml-32 -mb-32"></div>
+          
+          <div className="relative z-10">
+            <h3 className="text-4xl sm:text-5xl font-black mb-3 text-center">Why Thousands Love Teaching With Us 💜</h3>
+            <p className="text-center text-white/80 mb-12 text-lg max-w-2xl mx-auto">Join our thriving community of educators and unlock unlimited potential</p>
             
-            <div className="relative z-10">
-              <h3 className="text-4xl sm:text-5xl font-black mb-3 text-center">Why Thousands Love Teaching With Us 💜</h3>
-              <p className="text-center text-white/80 mb-12 text-lg max-w-2xl mx-auto">Join our thriving community of educators and unlock unlimited potential</p>
-              
-              {sectionsLoading ? (
-                <div className="text-center py-8">
-                  <p className="opacity-90 text-lg">Loading benefits...</p>
-                </div>
-              ) : (
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {pageSections
-                    .find((s) => s.section_name === 'why_join')
-                    ?.content?.benefits?.map((benefit: any, index: number) => (
-                      <div 
-                        key={index} 
-                        className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60"
-                      >
-                        {/* Icon container */}
-                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                          <div className="text-5xl">{benefit.icon}</div>
+            {sectionsLoading ? (
+              <div className="text-center py-8">
+                <p className="opacity-90 text-lg">Loading benefits...</p>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {(() => {
+                  const section = pageSections.find((s) => s.section_name === 'why_join');
+                  const benefits = (section?.content as { benefits?: Benefit[] } | undefined)?.benefits;
+                  return benefits && benefits.length > 0
+                    ? benefits.map((benefit: Benefit, index: number) => (
+                        <div 
+                          key={index} 
+                          className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60"
+                        >
+                          {/* Icon container */}
+                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                            <div className="text-5xl">{benefit.icon}</div>
+                          </div>
+                          
+                          <h4 className="text-xl font-bold mb-4 leading-tight group-hover:text-white transition-colors">{benefit.title}</h4>
+                          <p className="text-base leading-relaxed text-white/90 group-hover:text-white transition-colors">{benefit.description}</p>
+                          
+                          {/* Decorative hover effect */}
+                          <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-white/0 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </div>
+                      ))
+                    : (
+                      <>
+                        <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                            <div className="text-5xl">💰</div>
+                          </div>
+                          <h4 className="text-xl font-bold mb-4">Competitive Pay</h4>
+                          <p className="text-base leading-relaxed text-white/90">Earn $15-25+ per hour with rates based on your experience and qualifications</p>
                         </div>
                         
-                        <h4 className="text-xl font-bold mb-4 leading-tight group-hover:text-white transition-colors">{benefit.title}</h4>
-                        <p className="text-base leading-relaxed text-white/90 group-hover:text-white transition-colors">{benefit.description}</p>
+                        <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                            <div className="text-5xl">⏰</div>
+                          </div>
+                          <h4 className="text-xl font-bold mb-4">Flexible Schedule</h4>
+                          <p className="text-base leading-relaxed text-white/90">Work on your terms. Choose your hours and the number of students you teach</p>
+                        </div>
                         
-                        {/* Decorative hover effect */}
-                        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/0 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      </div>
-                    )) || (
-                    <>
-                      <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
-                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                          <div className="text-5xl">💰</div>
+                        <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                            <div className="text-5xl">🌍</div>
+                          </div>
+                          <h4 className="text-xl font-bold mb-4">Global Students</h4>
+                          <p className="text-base leading-relaxed text-white/90">Teach learners from Japan, Korea, China, Thailand, Vietnam and beyond</p>
                         </div>
-                        <h4 className="text-xl font-bold mb-4">Competitive Pay</h4>
-                        <p className="text-base leading-relaxed text-white/90">Earn $15-25+ per hour with rates based on your experience and qualifications</p>
-                      </div>
-                      
-                      <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
-                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                          <div className="text-5xl">⏰</div>
+                        
+                        <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                            <div className="text-5xl">👥</div>
+                          </div>
+                          <h4 className="text-xl font-bold mb-4">24/7 Support</h4>
+                          <p className="text-base leading-relaxed text-white/90">Our dedicated team is always ready to help you succeed</p>
                         </div>
-                        <h4 className="text-xl font-bold mb-4">Flexible Schedule</h4>
-                        <p className="text-base leading-relaxed text-white/90">Work on your terms. Choose your hours and the number of students you teach</p>
-                      </div>
-                      
-                      <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
-                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                          <div className="text-5xl">🌍</div>
+                        
+                        <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                            <div className="text-5xl">📈</div>
+                          </div>
+                          <h4 className="text-xl font-bold mb-4">Career Growth</h4>
+                          <p className="text-base leading-relaxed text-white/90">Access multiple teaching opportunities and advance your career</p>
                         </div>
-                        <h4 className="text-xl font-bold mb-4">Global Students</h4>
-                        <p className="text-base leading-relaxed text-white/90">Teach learners from Japan, Korea, China, Thailand, Vietnam and beyond</p>
-                      </div>
-                      
-                      <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
-                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                          <div className="text-5xl">👥</div>
-                        </div>
-                        <h4 className="text-xl font-bold mb-4">24/7 Support</h4>
-                        <p className="text-base leading-relaxed text-white/90">Our dedicated team is always ready to help you succeed</p>
-                      </div>
-                      
-                      <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
-                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                          <div className="text-5xl">📈</div>
-                        </div>
-                        <h4 className="text-xl font-bold mb-4">Career Growth</h4>
-                        <p className="text-base leading-relaxed text-white/90">Access multiple teaching opportunities and advance your career</p>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
+                      </>
+                    )
+                })()}
+              </div>
+            )}
           </div>
+        </div>
 
-          {/* Call to Action */}
-          <div className="text-center mt-16">
-            <p className="text-lg text-gray-700 mb-6">
-              Ready to join our community and transform your teaching career?
-            </p>
-            <Link href="#accounts-available" className="group relative inline-flex px-10 py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                Get Started Now <span className="group-hover:translate-x-1 transition">→</span>
-              </span>
-              <div className="absolute inset-0 bg-linear-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            </Link>
-          </div>
+        {/* Call to Action */}
+        <div className="text-center mt-16">
+          <p className="text-lg text-gray-700 mb-6">
+            Ready to join our community and transform your teaching career?
+          </p>
+          <Link href="#accounts-available" className="group relative inline-flex px-10 py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              Get Started Now <span className="group-hover:translate-x-1 transition">→</span>
+            </span>
+            <div className="absolute inset-0 bg-linear-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          </Link>
         </div>
       </section>
 
@@ -326,68 +338,22 @@ export default function Home() {
             <div className="w-24 h-1 bg-linear-to-r from-purple-600 to-pink-600 mx-auto rounded-full"></div>
           </div>
           
-          {sectionsLoading ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600">Loading testimonials...</p>
-            </div>
-          ) : (
-            <>
-              {pageSections.find((s) => s.section_name === 'testimonials')?.content?.testimonials && 
-               pageSections.find((s) => s.section_name === 'testimonials')?.content?.testimonials.length > 0 ? (
-                <div className="grid md:grid-cols-3 gap-8">
-                  {pageSections
-                    .find((s) => s.section_name === 'testimonials')
-                    ?.content?.testimonials?.map((testimonial: any, index: number) => (
-                      <div key={index} className="p-8 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group">
-                        <div className="flex items-center gap-1 mb-4">
-                          {[...Array(testimonial.rating || 5)].map((_, i) => <span key={i} className="text-2xl">⭐</span>)}
-                        </div>
-                        <p className="text-gray-700 leading-relaxed mb-6 italic">{`"${testimonial.quote}"`}</p>
-                        <div className="border-t-2 border-gray-200 pt-4">
-                          <p className="font-bold text-gray-900">{testimonial.name}</p>
-                          <p className="text-purple-600 font-semibold">{testimonial.role} • {testimonial.duration}</p>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              ) : (
-                <div className="grid md:grid-cols-3 gap-8">
-                  <div className="p-8 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group">
-                    <div className="flex items-center gap-1 mb-4">
-                      {[...Array(5)].map((_, i) => <span key={i} className="text-2xl">⭐</span>)}
-                    </div>
-                    <p className="text-gray-700 leading-relaxed mb-6 italic">{`"Echoverse changed my life! I went from freelance tutoring to earning $5k/month. The flexibility is unmatched and the support is amazing."`}</p>
-                    <div className="border-t-2 border-gray-200 pt-4">
-                      <p className="font-bold text-gray-900">Maria Santos</p>
-                      <p className="text-purple-600 font-semibold">Full-time Teacher • 6 months in</p>
-                    </div>
-                  </div>
-                  
-                  <div className="p-8 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group">
-                    <div className="flex items-center gap-1 mb-4">
-                      {[...Array(5)].map((_, i) => <span key={i} className="text-2xl">⭐</span>)}
-                    </div>
-                    <p className="text-gray-700 leading-relaxed mb-6 italic">{`"I started as a side hustle and got my first student within 48 hours. The platform is so easy to use and students are genuinely engaged."`}</p>
-                    <div className="border-t-2 border-gray-200 pt-4">
-                      <p className="font-bold text-gray-900">John Smith</p>
-                      <p className="text-purple-600 font-semibold">Part-time Educator • 3 months in</p>
-                    </div>
-                  </div>
-                  
-                  <div className="p-8 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group">
-                    <div className="flex items-center gap-1 mb-4">
-                      {[...Array(5)].map((_, i) => <span key={i} className="text-2xl">⭐</span>)}
-                    </div>
-                    <p className="text-gray-700 leading-relaxed mb-6 italic">{`"Teaching 20+ hours a week with complete flexibility. Students from all over the world. This is exactly what I was looking for!"`}</p>
-                    <div className="border-t-2 border-gray-200 pt-4">
-                      <p className="font-bold text-gray-900">Sarah Johnson</p>
-                      <p className="text-purple-600 font-semibold">Career Switcher • 9 months in</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+          {(() => {
+            const section = pageSections.find((s) => s.section_name === 'testimonials');
+            const testimonials = ((section?.content as { testimonials?: Testimonial[] } | undefined)?.testimonials || []).slice(0, visibleTestimonials);
+            const hasMore = (section?.content as { testimonials?: Testimonial[] } | undefined)?.testimonials && ((section?.content as { testimonials?: Testimonial[] } | undefined)?.testimonials || []).length > visibleTestimonials;
+            
+            return (
+              <TestimonialCarousel
+                testimonials={testimonials}
+                loading={sectionsLoading}
+                onLoadMore={() => {
+                  setVisibleTestimonials(prev => prev + 6);
+                }}
+                hasMore={hasMore || false}
+              />
+            );
+          })()}
         </div>
       </section>
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePageSections } from '@/hooks/usePageSections';
+import { useTestimonials } from '@/hooks/useTestimonials';
 import { ProtectedRoute } from '@/components/protected-route';
 
 type TabType = 'how_it_works' | 'requirements' | 'faq' | 'why_join' | 'testimonials';
@@ -605,47 +606,149 @@ function TestimonialsEditor({
   setSaving: (s: boolean) => void;
   setMessage: (m: any) => void;
 }) {
-  const [localContent, setLocalContent] = useState(section.content);
+  const { testimonials, loading, addTestimonial, updateTestimonial, deleteTestimonial } = useTestimonials();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string[]}>({});
+  const [formData, setFormData] = useState({
+    name: '',
+    role: '',
+    duration: '',
+    rating: 5,
+    quote: '',
+  });
 
-  const handleTestimonialChange = (index: number, field: string, value: any) => {
-    const newTestimonials = [...localContent.testimonials];
-    newTestimonials[index] = { ...newTestimonials[index], [field]: value };
-    setLocalContent({ ...localContent, testimonials: newTestimonials });
+  const validateTestimonial = (testimonial: any): string[] => {
+    const errors: string[] = [];
+    
+    if (!testimonial.name || testimonial.name.trim() === '') {
+      errors.push('Name is required');
+    }
+    if (!testimonial.role || testimonial.role.trim() === '') {
+      errors.push('Role is required');
+    }
+    if (!testimonial.duration || testimonial.duration.trim() === '') {
+      errors.push('Duration is required');
+    }
+    if (!testimonial.quote || testimonial.quote.trim() === '') {
+      errors.push('Quote is required');
+    }
+    if (!testimonial.rating || testimonial.rating < 1 || testimonial.rating > 5) {
+      errors.push('Rating must be between 1 and 5');
+    }
+    
+    return errors;
   };
 
-  const handleAddTestimonial = () => {
-    const newContent = { ...localContent };
-    newContent.testimonials.push({ 
-      name: '', 
-      role: '', 
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      role: '',
       duration: '',
       rating: 5,
-      quote: '' 
+      quote: '',
     });
-    setLocalContent(newContent);
+    setEditingId(null);
+    setValidationErrors({});
   };
 
-  const handleRemoveTestimonial = (index: number) => {
-    const newContent = { ...localContent };
-    newContent.testimonials.splice(index, 1);
-    setLocalContent(newContent);
+  const handleFormChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    setValidationErrors({});
   };
 
-  const handleSave = async () => {
+  const handleAddTestimonial = async () => {
+    const errors = validateTestimonial(formData);
+    if (errors.length > 0) {
+      setValidationErrors({ new: errors });
+      setMessage({ type: 'error', text: 'Please fill in all required fields.' });
+      return;
+    }
+
     setSaving(true);
     setMessage(null);
-    const success = await onUpdate('testimonials', {
-      title: section.title,
-      subtitle: section.subtitle,
-      content: localContent,
+
+    const result = await addTestimonial({
+      name: formData.name,
+      role: formData.role,
+      duration: formData.duration,
+      quote: formData.quote,
+      rating: formData.rating,
+      display_order: 0, // Will be auto-assigned by hook
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     });
+
     setSaving(false);
-    if (success) {
-      setMessage({ type: 'success', text: 'Testimonials section updated!' });
+
+    if (result) {
+      setMessage({ type: 'success', text: '✅ Testimonial added successfully!' });
+      resetForm();
       setTimeout(() => setMessage(null), 3000);
     } else {
-      setMessage({ type: 'error', text: 'Failed to save changes.' });
+      setMessage({ type: 'error', text: 'Failed to add testimonial. Please try again.' });
     }
+  };
+
+  const handleUpdateTestimonial = async (id: string) => {
+    const errors = validateTestimonial(formData);
+    if (errors.length > 0) {
+      setValidationErrors({ [id]: errors });
+      setMessage({ type: 'error', text: 'Please fix validation errors.' });
+      return;
+    }
+
+    setSaving(true);
+    setMessage(null);
+
+    const success = await updateTestimonial(id, {
+      name: formData.name,
+      role: formData.role,
+      duration: formData.duration,
+      quote: formData.quote,
+      rating: formData.rating,
+    });
+
+    setSaving(false);
+
+    if (success) {
+      setMessage({ type: 'success', text: '✏️ Testimonial updated successfully!' });
+      resetForm();
+      setTimeout(() => setMessage(null), 3000);
+    } else {
+      setMessage({ type: 'error', text: 'Failed to update testimonial.' });
+    }
+  };
+
+  const handleDeleteTestimonial = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this testimonial?')) return;
+
+    setSaving(true);
+    setMessage(null);
+
+    const success = await deleteTestimonial(id);
+
+    setSaving(false);
+
+    if (success) {
+      setMessage({ type: 'success', text: '🗑️ Testimonial deleted successfully!' });
+      setEditingId(null);
+      setTimeout(() => setMessage(null), 3000);
+    } else {
+      setMessage({ type: 'error', text: 'Failed to delete testimonial.' });
+    }
+  };
+
+  const handleEditTestimonial = (testimonial: any) => {
+    setEditingId(testimonial.id);
+    setFormData({
+      name: testimonial.name,
+      role: testimonial.role,
+      duration: testimonial.duration,
+      quote: testimonial.quote,
+      rating: testimonial.rating,
+    });
+    setValidationErrors({});
   };
 
   return (
@@ -655,153 +758,210 @@ function TestimonialsEditor({
           <h2 className="text-3xl font-bold mb-2">Testimonials</h2>
           <p className="text-gray-600">Manage teacher testimonials displayed on the homepage</p>
         </div>
-        <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg px-4 py-2">
-          <p className="text-sm font-semibold text-purple-900">Total: {localContent.testimonials?.length || 0} testimonials</p>
+        <div className="bg-linear-to-r from-purple-100 to-pink-100 rounded-lg px-4 py-2">
+          <p className="text-sm font-semibold text-purple-900">Total: {testimonials?.length || 0} testimonials</p>
         </div>
       </div>
 
-      {localContent.testimonials && localContent.testimonials.length > 0 ? (
-        <div className="space-y-4 mb-8">
-          {localContent.testimonials.map((testimonial: any, i: number) => (
-            <div 
-              key={i} 
-              className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-purple-300 hover:shadow-lg transition-all duration-300 group"
-            >
-              {/* Header with number and badge */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-linear-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold">
-                    {i + 1}
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-500">Testimonial #{i + 1}</p>
-                    <p className="font-semibold text-gray-900">{testimonial.name || '(Name not set)'}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{'⭐'.repeat(testimonial.rating || 5)}</span>
-                </div>
-              </div>
-
-              {/* Form Grid */}
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">👤 Name *</label>
-                    <input
-                      type="text"
-                      value={testimonial.name}
-                      onChange={(e) => handleTestimonialChange(i, 'name', e.target.value)}
-                      placeholder="e.g. Maria Santos"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">💼 Role *</label>
-                    <input
-                      type="text"
-                      value={testimonial.role}
-                      onChange={(e) => handleTestimonialChange(i, 'role', e.target.value)}
-                      placeholder="e.g. Full-time Teacher"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">⏱️ Duration *</label>
-                    <input
-                      type="text"
-                      value={testimonial.duration}
-                      onChange={(e) => handleTestimonialChange(i, 'duration', e.target.value)}
-                      placeholder="e.g. 6 months in"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">⭐ Rating</label>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        onClick={() => handleTestimonialChange(i, 'rating', star)}
-                        className={`text-3xl px-2 py-1 rounded transition ${
-                          star <= (testimonial.rating || 5)
-                            ? 'bg-yellow-100 scale-110'
-                            : 'bg-gray-100 hover:bg-gray-200'
-                        }`}
-                      >
-                        ⭐
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">💬 Testimonial Quote *</label>
-                  <textarea
-                    value={testimonial.quote}
-                    onChange={(e) => handleTestimonialChange(i, 'quote', e.target.value)}
-                    placeholder="Enter the testimonial quote..."
-                    rows={4}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition resize-none"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{testimonial.quote?.length || 0}/300 characters</p>
-                </div>
-
-                {/* Preview Card */}
-                <div className="mt-6 pt-4 border-t-2 border-gray-200">
-                  <p className="text-xs font-semibold text-gray-600 mb-3">📋 Preview:</p>
-                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-lg border border-gray-200">
-                    <div className="flex gap-1 mb-2">
-                      {[...Array(testimonial.rating || 5)].map((_, idx) => (
-                        <span key={idx} className="text-lg">⭐</span>
-                      ))}
-                    </div>
-                    <p className="text-gray-700 italic mb-2">"{testimonial.quote || '(Quote preview)'}"</p>
-                    <p className="font-semibold text-gray-900 text-sm">{testimonial.name || '(Name)'}</p>
-                    <p className="text-purple-600 text-xs font-semibold">{testimonial.role || '(Role)'} • {testimonial.duration || '(Duration)'}</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="mt-4 flex gap-2 pt-4 border-t border-gray-200">
-                <button
-                  onClick={() => handleRemoveTestimonial(i)}
-                  className="flex-1 px-4 py-2 bg-red-50 text-red-600 border border-red-300 rounded-lg font-semibold hover:bg-red-100 hover:border-red-400 transition flex items-center justify-center gap-2"
-                >
-                  🗑️ Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-          <p className="text-gray-600 text-lg mb-4">No testimonials yet. Add your first one!</p>
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-12">
+          <p className="text-gray-600 text-lg">Loading testimonials...</p>
         </div>
       )}
 
-      {/* Add Button */}
-      <div className="flex gap-3 mb-8">
-        <button
-          onClick={handleAddTestimonial}
-          className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 transition shadow-md flex items-center justify-center gap-2"
-        >
-          ➕ Add New Testimonial
-        </button>
+      {/* Add/Edit Form */}
+      <div className="bg-linear-to-br from-purple-50 to-pink-50 border-2 border-purple-200 rounded-xl p-8 mb-8">
+        <h3 className="text-2xl font-bold mb-6">
+          {editingId ? '✏️ Edit Testimonial' : '➕ Add New Testimonial'}
+        </h3>
+
+        {/* Validation Errors */}
+        {validationErrors.new && validationErrors.new.length > 0 && (
+          <div className="mb-4 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
+            <p className="text-sm font-semibold text-red-700 mb-2">⚠️ Validation Errors:</p>
+            <ul className="text-sm text-red-600 list-disc list-inside">
+              {validationErrors.new.map((error, idx) => (
+                <li key={idx}>{error}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">👤 Name *</label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => handleFormChange('name', e.target.value)}
+                placeholder="e.g. Maria Santos"
+                className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">💼 Role *</label>
+              <input
+                type="text"
+                value={formData.role}
+                onChange={(e) => handleFormChange('role', e.target.value)}
+                placeholder="e.g. Full-time Teacher"
+                className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">⏱️ Duration *</label>
+              <input
+                type="text"
+                value={formData.duration}
+                onChange={(e) => handleFormChange('duration', e.target.value)}
+                placeholder="e.g. 6 months in"
+                className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">⭐ Rating</label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={`form-star-${star}`}
+                  onClick={() => handleFormChange('rating', star)}
+                  className={`text-3xl px-2 py-1 rounded transition ${
+                    star <= formData.rating
+                      ? 'bg-yellow-100 scale-110'
+                      : 'bg-gray-100 hover:bg-gray-200'
+                  }`}
+                >
+                  ⭐
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">💬 Testimonial Quote *</label>
+            <textarea
+              value={formData.quote}
+              onChange={(e) => handleFormChange('quote', e.target.value)}
+              placeholder="Enter the testimonial quote..."
+              rows={4}
+              className="w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-gray-900 focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition resize-none"
+            />
+            <p className="text-xs text-gray-500 mt-1">{formData.quote.length}/300 characters</p>
+          </div>
+
+          {/* Form Preview */}
+          <div className="mt-6 pt-4 border-t-2 border-purple-200">
+            <p className="text-xs font-semibold text-gray-600 mb-3">📋 Preview:</p>
+            <div className="bg-white p-4 rounded-lg border border-purple-300">
+              <div className="flex gap-1 mb-2">
+                {[...Array(formData.rating)].map((_, idx) => (
+                  <span key={`preview-st-${idx}`} className="text-lg">⭐</span>
+                ))}
+              </div>
+              <p className="text-gray-700 italic mb-2">"{formData.quote || '(Quote preview)'}"</p>
+              <p className="font-semibold text-gray-900 text-sm">{formData.name || '(Name)'}</p>
+              <p className="text-purple-600 text-xs font-semibold">{formData.role || '(Role)'} • {formData.duration || '(Duration)'}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Form Buttons */}
+        <div className="flex gap-3 mt-6">
+          {editingId ? (
+            <>
+              <button
+                onClick={() => handleUpdateTestimonial(editingId)}
+                className="flex-1 px-6 py-3 bg-linear-to-r from-blue-600 to-blue-700 text-white rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition shadow-md"
+              >
+                ✏️ Update Testimonial
+              </button>
+              <button
+                onClick={resetForm}
+                className="px-6 py-3 bg-gray-300 text-gray-800 rounded-lg font-bold hover:bg-gray-400 transition"
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={handleAddTestimonial}
+              className="flex-1 px-6 py-3 bg-linear-to-r from-green-600 to-green-700 text-white rounded-lg font-bold hover:from-green-700 hover:to-green-800 transition shadow-md"
+            >
+              ➕ Add Testimonial
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Save Button */}
-      <div className="flex gap-3">
-        <button
-          onClick={handleSave}
-          className="flex-1 px-8 py-4 bg-black text-white rounded-lg font-bold hover:bg-gray-800 transition shadow-lg"
-        >
-          💾 Save All Changes
-        </button>
-      </div>
+      {/* Testimonials List */}
+      {!loading && (
+        <>
+          {testimonials && testimonials.length > 0 ? (
+            <div className="space-y-4 mb-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Existing Testimonials ({testimonials.length})</h3>
+              {testimonials.map((testimonial) => (
+                <div 
+                  key={testimonial.id}
+                  className={`bg-white border-2 rounded-xl p-6 hover:shadow-lg transition-all duration-300 ${
+                    editingId === testimonial.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-linear-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        {testimonials.indexOf(testimonial) + 1}
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-500">Order: {testimonial.display_order}</p>
+                        <p className="font-semibold text-gray-900 text-lg">{testimonial.name}</p>
+                        <p className="text-purple-600 text-sm">{testimonial.role}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">{'⭐'.repeat(testimonial.rating)}</span>
+                    </div>
+                  </div>
+
+                  <p className="text-gray-700 italic mb-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                    "{testimonial.quote}"
+                  </p>
+
+                  <p className="text-sm text-gray-500 mb-4">
+                    ⏱️ {testimonial.duration} • Updated: {new Date(testimonial.updated_at).toLocaleDateString()}
+                  </p>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEditTestimonial(testimonial)}
+                      className={`flex-1 px-4 py-2 rounded-lg font-semibold transition ${
+                        editingId === testimonial.id
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-blue-50 text-blue-600 border border-blue-300 hover:bg-blue-100'
+                      }`}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteTestimonial(testimonial.id)}
+                      className="flex-1 px-4 py-2 bg-red-50 text-red-600 border border-red-300 rounded-lg font-semibold hover:bg-red-100 hover:border-red-400 transition"
+                    >
+                      🗑️ Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 mb-8">
+              <p className="text-gray-600 text-lg">No testimonials yet. Add your first one above!</p>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }
