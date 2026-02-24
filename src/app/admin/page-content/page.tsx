@@ -675,8 +675,6 @@ function TestimonialsEditor({
       rating: formData.rating,
       display_order: 0, // Will be auto-assigned by hook
       is_active: true,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
     });
 
     setSaving(false);
