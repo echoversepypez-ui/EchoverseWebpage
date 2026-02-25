@@ -27,6 +27,34 @@
   transform: scale(0.95);
 }
 
+/* New button for starting internal live chat */
+.startChatButton {
+  width: 100%;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background-color: #a855f7;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.startChatButton:hover {
+  background-color: #9333ea;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(168, 85, 247, 0.5);
+}
+
 .chatbotContainer {
   position: fixed;
   bottom: 20px;

@@ -91,24 +91,24 @@ export function TestimonialCarousel({
       {/* Carousel */}
       <div className="relative">
         <div className="overflow-hidden">
-          <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {visibleCards.map((testimonial: Testimonial, index: number) => (
               <div
                 key={index}
-                className="p-6 bg-white border-2 border-gray-200 rounded-2xl hover:border-purple-600 hover:shadow-2xl transition-all duration-300 group h-full flex flex-col"
+                className="p-3 bg-white border border-gray-200 rounded-lg hover:border-purple-600 hover:shadow-lg transition-all duration-300 group h-full flex flex-col"
               >
-                <div className="flex items-center gap-1 mb-4">
+                <div className="flex items-center gap-1 mb-2">
                   {[...Array(testimonial.rating || 5)].map((_, i) => (
-                    <span key={i} className="text-lg">
+                    <span key={i} className="text-sm">
                       ⭐
                     </span>
                   ))}
                 </div>
-                <p className="text-gray-700 leading-relaxed mb-6 italic grow">
+                <p className="text-gray-700 leading-tight mb-3 italic grow text-xs">
                   {`"${testimonial.quote}"`}
                 </p>
-                <div className="border-t-2 border-gray-200 pt-4 mt-auto">
-                  <p className="font-bold text-gray-900 text-sm">{testimonial.name}</p>
+                <div className="border-t border-gray-200 pt-2 mt-auto">
+                  <p className="font-bold text-gray-900 text-xs">{testimonial.name}</p>
                   <p className="text-purple-600 font-semibold text-xs">
                     {testimonial.role} • {testimonial.duration}
                   </p>

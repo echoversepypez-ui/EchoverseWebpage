@@ -88,6 +88,10 @@ export const useTestimonials = () => {
       }
 
       console.log('✅ Testimonial added successfully');
+      
+      // Also sync to page_sections for homepage display
+      await syncTestimonialsToPageSections();
+      
       setTestimonials((prev) => [...prev, data]);
       return data;
     } catch (err) {
@@ -133,6 +137,10 @@ export const useTestimonials = () => {
       }
 
       console.log('✅ Testimonial updated successfully');
+      
+      // Sync changes to page_sections
+      await syncTestimonialsToPageSections();
+      
       return true;
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to update testimonial';
@@ -160,6 +168,10 @@ export const useTestimonials = () => {
 
       setTestimonials((prev) => prev.filter((t) => t.id !== id));
       console.log('✅ Testimonial deleted successfully');
+      
+      // Sync changes to page_sections
+      await syncTestimonialsToPageSections();
+      
       return true;
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to delete testimonial';
@@ -197,12 +209,65 @@ export const useTestimonials = () => {
       // Refetch all testimonials
       await fetchTestimonials();
       console.log('✅ Testimonials reordered successfully');
+      
+      // Sync changes to page_sections
+      await syncTestimonialsToPageSections();
+      
       return true;
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to reorder testimonials';
       console.error('❌ Exception:', errorMsg);
       setError(errorMsg);
       return false;
+    }
+  };
+
+  const syncTestimonialsToPageSections = async (): Promise<void> => {
+    try {
+      console.log('🔄 Syncing testimonials to page_sections...');
+      
+      // Get all active testimonials from testimonials table
+      const { data: allTestimonials, error: fetchError } = await supabase
+        .from('testimonials')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+
+      if (fetchError) {
+        console.error('❌ Sync fetch error:', fetchError);
+        return;
+      }
+
+      // Transform testimonials for JSONB storage
+      const formattedTestimonials = (allTestimonials || []).map((t) => ({
+        id: t.id,
+        name: t.name,
+        role: t.role,
+        duration: t.duration,
+        quote: t.quote,
+        rating: t.rating,
+      }));
+
+      // Update page_sections with new testimonials list
+      const { error: updateError } = await supabase
+        .from('page_sections')
+        .update({
+          content: {
+            testimonials: formattedTestimonials,
+          },
+          updated_at: new Date().toISOString(),
+        })
+        .eq('section_name', 'testimonials');
+
+      if (updateError) {
+        console.error('❌ Sync update error:', updateError);
+        return;
+      }
+
+      console.log('✅ Testimonials synced to page_sections');
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to sync testimonials';
+      console.error('❌ Sync exception:', errorMsg);
     }
   };
 

@@ -1,8 +1,10 @@
 export {};
 
+// global types used across the app
+
 declare global {
   interface Window {
-    hsConversationsOnReady?: Array<() => void>;
-    HubSpotConversations?: any;
+    // add any custom globals here
+    [key: string]: any;
   }
 }

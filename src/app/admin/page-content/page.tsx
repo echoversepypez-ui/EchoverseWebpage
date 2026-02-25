@@ -172,6 +172,7 @@ function HowItWorksEditor({
   setMessage: (m: any) => void;
 }) {
   const [localContent, setLocalContent] = useState(section.content);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleStepChange = (index: number, field: string, value: string) => {
     const newSteps = [...localContent.steps];
@@ -180,19 +181,32 @@ function HowItWorksEditor({
   };
 
   const handleSave = async () => {
+    setIsLoading(true);
     setSaving(true);
     setMessage(null);
-    const success = await onUpdate('how_it_works', {
-      title: section.title,
-      subtitle: section.subtitle,
-      content: localContent,
-    });
-    setSaving(false);
-    if (success) {
-      setMessage({ type: 'success', text: 'How It Works section updated!' });
-      setTimeout(() => setMessage(null), 3000);
-    } else {
-      setMessage({ type: 'error', text: 'Failed to save changes.' });
+    
+    try {
+      console.log('Saving How It Works with content:', localContent);
+      const success = await onUpdate('how_it_works', {
+        title: section.title,
+        subtitle: section.subtitle,
+        content: localContent,
+      });
+      
+      setSaving(false);
+      setIsLoading(false);
+      
+      if (success) {
+        setMessage({ type: 'success', text: '✅ How It Works section updated successfully!' });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: 'error', text: '❌ Failed to save changes. Please check your browser console for details.' });
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      setSaving(false);
+      setIsLoading(false);
+      setMessage({ type: 'error', text: `❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}` });
     }
   };
 
@@ -201,47 +215,61 @@ function HowItWorksEditor({
       <h2 className="text-2xl font-bold mb-6">How It Works Steps</h2>
 
       <div className="space-y-6 mb-8">
-        {localContent.steps?.map((step: any, i: number) => (
-          <div key={i} className="border border-gray-300 rounded-lg p-6 bg-gray-50">
-            <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-semibold text-black mb-2">Step Number</label>
-                <input
-                  type="number"
-                  value={step.number}
-                  onChange={(e) => handleStepChange(i, 'number', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
-                  min="1"
-                />
+        {localContent.steps && localContent.steps.length > 0 ? (
+          localContent.steps.map((step: any, i: number) => (
+            <div key={i} className="border border-gray-300 rounded-lg p-6 bg-gray-50">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">Step Number</label>
+                  <input
+                    type="number"
+                    value={step.number}
+                    onChange={(e) => handleStepChange(i, 'number', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+                    min="1"
+                    disabled={isLoading}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">Title</label>
+                  <input
+                    type="text"
+                    value={step.title}
+                    onChange={(e) => handleStepChange(i, 'title', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+                    disabled={isLoading}
+                  />
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-black mb-2">Title</label>
-                <input
-                  type="text"
-                  value={step.title}
-                  onChange={(e) => handleStepChange(i, 'title', e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+                <label className="block text-sm font-semibold text-black mb-2">Description</label>
+                <textarea
+                  value={step.description}
+                  onChange={(e) => handleStepChange(i, 'description', e.target.value)}
+                  rows={3}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black resize-none"
+                  disabled={isLoading}
                 />
               </div>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-black mb-2">Description</label>
-              <textarea
-                value={step.description}
-                onChange={(e) => handleStepChange(i, 'description', e.target.value)}
-                rows={3}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black resize-none"
-              />
-            </div>
+          ))
+        ) : (
+          <div className="border border-yellow-300 rounded-lg p-6 bg-yellow-50">
+            <p className="text-yellow-800 font-semibold">⚠️ No steps found. Please add steps to this section.</p>
           </div>
-        ))}
+        )}
       </div>
 
       <button
         onClick={handleSave}
-        className="bg-black text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-800 transition"
+        disabled={isLoading}
+        className={`${
+          isLoading
+            ? 'bg-gray-600 cursor-not-allowed'
+            : 'bg-black hover:bg-gray-800'
+        } text-white px-8 py-3 rounded-lg font-bold transition`}
       >
-        Save Changes
+        {isLoading ? 'Saving...' : 'Save Changes'}
       </button>
     </div>
   );
@@ -260,6 +288,7 @@ function RequirementsEditor({
   setMessage: (m: any) => void;
 }) {
   const [localContent, setLocalContent] = useState(section.content);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRequirementChange = (type: 'essential' | 'nice_to_have', index: number, field: string, value: string) => {
     const newContent = { ...localContent };
@@ -280,19 +309,30 @@ function RequirementsEditor({
   };
 
   const handleSave = async () => {
+    setIsLoading(true);
     setSaving(true);
     setMessage(null);
-    const success = await onUpdate('requirements', {
-      title: section.title,
-      subtitle: section.subtitle,
-      content: localContent,
-    });
-    setSaving(false);
-    if (success) {
-      setMessage({ type: 'success', text: 'Requirements section updated!' });
-      setTimeout(() => setMessage(null), 3000);
-    } else {
-      setMessage({ type: 'error', text: 'Failed to save changes.' });
+    
+    try {
+      console.log('Saving Requirements with content:', localContent);
+      const success = await onUpdate('requirements', {
+        title: section.title,
+        subtitle: section.subtitle,
+        content: localContent,
+      });
+      setSaving(false);
+      setIsLoading(false);
+      if (success) {
+        setMessage({ type: 'success', text: '✅ Requirements section updated successfully!' });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: 'error', text: '❌ Failed to save changes. Please check your browser console for details.' });
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      setSaving(false);
+      setIsLoading(false);
+      setMessage({ type: 'error', text: `❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}` });
     }
   };
 
@@ -313,11 +353,15 @@ function RequirementsEditor({
                   onChange={(e) => handleRequirementChange('essential', i, 'text', e.target.value)}
                   placeholder="Requirement text"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+                  disabled={isLoading}
                 />
               </div>
               <button
                 onClick={() => handleRemoveRequirement('essential', i)}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
+                disabled={isLoading}
+                className={`px-4 py-2 text-white rounded-lg font-semibold transition ${
+                  isLoading ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'
+                }`}
               >
                 Remove
               </button>
@@ -326,7 +370,10 @@ function RequirementsEditor({
         </div>
         <button
           onClick={() => handleAddRequirement('essential')}
-          className="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition"
+          disabled={isLoading}
+          className={`px-4 py-2 text-white rounded-lg font-semibold transition ${
+            isLoading ? 'bg-gray-500 cursor-not-allowed' : 'bg-gray-600 hover:bg-gray-700'
+          }`}
         >
           + Add Requirement
         </button>
@@ -345,11 +392,15 @@ function RequirementsEditor({
                   onChange={(e) => handleRequirementChange('nice_to_have', i, 'text', e.target.value)}
                   placeholder="Nice to have text"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+                  disabled={isLoading}
                 />
               </div>
               <button
                 onClick={() => handleRemoveRequirement('nice_to_have', i)}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
+                disabled={isLoading}
+                className={`px-4 py-2 text-white rounded-lg font-semibold transition ${
+                  isLoading ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'
+                }`}
               >
                 Remove
               </button>
@@ -358,7 +409,10 @@ function RequirementsEditor({
         </div>
         <button
           onClick={() => handleAddRequirement('nice_to_have')}
-          className="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition"
+          disabled={isLoading}
+          className={`px-4 py-2 text-white rounded-lg font-semibold transition ${
+            isLoading ? 'bg-gray-500 cursor-not-allowed' : 'bg-gray-600 hover:bg-gray-700'
+          }`}
         >
           + Add Item
         </button>
@@ -366,9 +420,14 @@ function RequirementsEditor({
 
       <button
         onClick={handleSave}
-        className="bg-black text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-800 transition"
+        disabled={isLoading}
+        className={`${
+          isLoading
+            ? 'bg-gray-600 cursor-not-allowed'
+            : 'bg-black hover:bg-gray-800'
+        } text-white px-8 py-3 rounded-lg font-bold transition`}
       >
-        Save Changes
+        {isLoading ? 'Saving...' : 'Save Changes'}
       </button>
     </div>
   );
@@ -387,6 +446,7 @@ function FAQEditor({
   setMessage: (m: any) => void;
 }) {
   const [localContent, setLocalContent] = useState(section.content);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleQuestionChange = (index: number, field: 'q' | 'a', value: string) => {
     const newQuestions = [...localContent.questions];
@@ -407,19 +467,30 @@ function FAQEditor({
   };
 
   const handleSave = async () => {
+    setIsLoading(true);
     setSaving(true);
     setMessage(null);
-    const success = await onUpdate('faq', {
-      title: section.title,
-      subtitle: section.subtitle,
-      content: localContent,
-    });
-    setSaving(false);
-    if (success) {
-      setMessage({ type: 'success', text: 'FAQ section updated!' });
-      setTimeout(() => setMessage(null), 3000);
-    } else {
-      setMessage({ type: 'error', text: 'Failed to save changes.' });
+    
+    try {
+      console.log('Saving FAQ with content:', localContent);
+      const success = await onUpdate('faq', {
+        title: section.title,
+        subtitle: section.subtitle,
+        content: localContent,
+      });
+      setSaving(false);
+      setIsLoading(false);
+      if (success) {
+        setMessage({ type: 'success', text: '✅ FAQ section updated successfully!' });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: 'error', text: '❌ Failed to save changes. Please check your browser console for details.' });
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      setSaving(false);
+      setIsLoading(false);
+      setMessage({ type: 'error', text: `❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}` });
     }
   };
 
@@ -438,6 +509,7 @@ function FAQEditor({
                 onChange={(e) => handleQuestionChange(i, 'q', e.target.value)}
                 placeholder="Enter question"
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+                disabled={isLoading}
               />
             </div>
             <div className="mb-4">
@@ -448,11 +520,15 @@ function FAQEditor({
                 placeholder="Enter answer"
                 rows={4}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black resize-none"
+                disabled={isLoading}
               />
             </div>
             <button
               onClick={() => handleRemoveQuestion(i)}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
+              disabled={isLoading}
+              className={`px-4 py-2 text-white rounded-lg font-semibold transition ${
+                isLoading ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'
+              }`}
             >
               Remove Question
             </button>
@@ -463,7 +539,10 @@ function FAQEditor({
       <div className="mb-8">
         <button
           onClick={handleAddQuestion}
-          className="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition"
+          disabled={isLoading}
+          className={`px-4 py-2 text-white rounded-lg font-semibold transition ${
+            isLoading ? 'bg-gray-500 cursor-not-allowed' : 'bg-gray-600 hover:bg-gray-700'
+          }`}
         >
           + Add Question
         </button>
@@ -471,9 +550,14 @@ function FAQEditor({
 
       <button
         onClick={handleSave}
-        className="bg-black text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-800 transition"
+        disabled={isLoading}
+        className={`${
+          isLoading
+            ? 'bg-gray-600 cursor-not-allowed'
+            : 'bg-black hover:bg-gray-800'
+        } text-white px-8 py-3 rounded-lg font-bold transition`}
       >
-        Save Changes
+        {isLoading ? 'Saving...' : 'Save Changes'}
       </button>
     </div>
   );
@@ -492,6 +576,7 @@ function WhyJoinEditor({
   setMessage: (m: any) => void;
 }) {
   const [localContent, setLocalContent] = useState(section.content);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleBenefitChange = (index: number, field: string, value: string) => {
     const newBenefits = [...localContent.benefits];
@@ -512,19 +597,30 @@ function WhyJoinEditor({
   };
 
   const handleSave = async () => {
+    setIsLoading(true);
     setSaving(true);
     setMessage(null);
-    const success = await onUpdate('why_join', {
-      title: section.title,
-      subtitle: section.subtitle,
-      content: localContent,
-    });
-    setSaving(false);
-    if (success) {
-      setMessage({ type: 'success', text: 'Why Join section updated!' });
-      setTimeout(() => setMessage(null), 3000);
-    } else {
-      setMessage({ type: 'error', text: 'Failed to save changes.' });
+    
+    try {
+      console.log('Saving Why Join with content:', localContent);
+      const success = await onUpdate('why_join', {
+        title: section.title,
+        subtitle: section.subtitle,
+        content: localContent,
+      });
+      setSaving(false);
+      setIsLoading(false);
+      if (success) {
+        setMessage({ type: 'success', text: '✅ Why Join section updated successfully!' });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: 'error', text: '❌ Failed to save changes. Please check your browser console for details.' });
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      setSaving(false);
+      setIsLoading(false);
+      setMessage({ type: 'error', text: `❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}` });
     }
   };
 
@@ -544,6 +640,7 @@ function WhyJoinEditor({
                   onChange={(e) => handleBenefitChange(i, 'icon', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black text-center text-2xl"
                   maxLength={2}
+                  disabled={isLoading}
                 />
               </div>
               <div className="col-span-2">
@@ -553,6 +650,7 @@ function WhyJoinEditor({
                   value={benefit.title}
                   onChange={(e) => handleBenefitChange(i, 'title', e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -563,11 +661,15 @@ function WhyJoinEditor({
                 onChange={(e) => handleBenefitChange(i, 'description', e.target.value)}
                 rows={3}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black resize-none"
+                disabled={isLoading}
               />
             </div>
             <button
               onClick={() => handleRemoveBenefit(i)}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
+              disabled={isLoading}
+              className={`px-4 py-2 text-white rounded-lg font-semibold transition ${
+                isLoading ? 'bg-red-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'
+              }`}
             >
               Remove Benefit
             </button>
@@ -578,7 +680,10 @@ function WhyJoinEditor({
       <div className="mb-8">
         <button
           onClick={handleAddBenefit}
-          className="px-4 py-2 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition"
+          disabled={isLoading}
+          className={`px-4 py-2 text-white rounded-lg font-semibold transition ${
+            isLoading ? 'bg-gray-500 cursor-not-allowed' : 'bg-gray-600 hover:bg-gray-700'
+          }`}
         >
           + Add Benefit
         </button>
@@ -586,9 +691,14 @@ function WhyJoinEditor({
 
       <button
         onClick={handleSave}
-        className="bg-black text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-800 transition"
+        disabled={isLoading}
+        className={`${
+          isLoading
+            ? 'bg-gray-600 cursor-not-allowed'
+            : 'bg-black hover:bg-gray-800'
+        } text-white px-8 py-3 rounded-lg font-bold transition`}
       >
-        Save Changes
+        {isLoading ? 'Saving...' : 'Save Changes'}
       </button>
     </div>
   );

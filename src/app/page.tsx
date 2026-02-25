@@ -128,23 +128,23 @@ export default function Home() {
 
 
       {/* Welcome Section - Welcoming Introduction */}
-      <section className="py-24 bg-linear-to-b from-purple-50 via-pink-50 to-white relative overflow-hidden">
+      <section className="py-8 bg-linear-to-b from-purple-50 via-pink-50 to-white relative overflow-hidden">
         {/* Decorative elements */}
-        <div className="absolute top-10 left-5 text-5xl opacity-10 animate-bounce">🌟</div>
-        <div className="absolute bottom-20 right-10 text-6xl opacity-10 animate-bounce" style={{animationDelay: '0.5s'}}>✨</div>
+        <div className="absolute top-10 left-5 text-3xl opacity-10 animate-bounce">🌟</div>
+        <div className="absolute bottom-20 right-10 text-4xl opacity-10 animate-bounce" style={{animationDelay: '0.5s'}}>✨</div>
         
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           {/* Warm Welcome */}
-          <div className="text-center mb-16 space-y-6">
+          <div className="text-center mb-6 space-y-3">
             <div className="inline-block">
-              <div className="text-6xl mb-4">👋 Welcome!</div>
+              <div className="text-4xl mb-2">👋 Welcome!</div>
             </div>
             
-            <h2 className="text-4xl sm:text-5xl font-black text-gray-900 leading-tight">
+            <h2 className="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">
               Welcome to <span className="bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Echoverse Online Tutorial Services</span>
             </h2>
             
-            <p className="text-xl text-gray-700 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-sm text-gray-700 leading-relaxed max-w-2xl mx-auto">
               {`We're more than just a platform—we're a thriving community of passionate educators empowering learners around the globe. Whether you're an experienced teacher or just starting your journey, Echoverse is your partner in success.`}
             </p>
           </div>
@@ -330,12 +330,12 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-32 bg-linear-to-br from-slate-50 via-white to-purple-50">
+      <section className="py-8 bg-linear-to-br from-slate-50 via-white to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20 space-y-4">
-            <h2 className="text-5xl sm:text-6xl font-black text-gray-900">What Teachers Say</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">Real stories from successful educators in our community</p>
-            <div className="w-24 h-1 bg-linear-to-r from-purple-600 to-pink-600 mx-auto rounded-full"></div>
+          <div className="text-center mb-6 space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-black text-gray-900">What Teachers Say</h2>
+            <p className="text-sm text-gray-600 max-w-2xl mx-auto">Real stories from successful educators in our community</p>
+            <div className="w-16 h-0.5 bg-linear-to-r from-purple-600 to-pink-600 mx-auto rounded-full"></div>
           </div>
           
           {(() => {
@@ -358,11 +358,11 @@ export default function Home() {
       </section>
 
       {/* Detailed Journey Timeline */}
-      <section className="py-24 bg-linear-to-b from-purple-50 via-white to-pink-50">
+      <section className="py-8 bg-linear-to-b from-purple-50 via-white to-pink-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl sm:text-5xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">Your Journey to Success</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">Follow our streamlined 4-step process from application to your first class. Each step is designed to set you up for success with comprehensive support every step of the way.</p>
+          <div className="text-center mb-6">
+            <h2 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">Your Journey to Success</h2>
+            <p className="text-sm text-gray-600 max-w-3xl mx-auto leading-relaxed">Follow our streamlined 4-step process from application to your first class. Each step is designed to set you up for success with comprehensive support every step of the way.</p>
           </div>
 
           {/* Timeline Steps */}

@@ -59,7 +59,9 @@ export const usePageSections = (sectionName?: string) => {
 
       // Validate content structure
       if (!updates.content) {
-        setError('Content is required');
+        const errMsg = 'Content is required';
+        console.error(errMsg);
+        setError(errMsg);
         return false;
       }
 
@@ -68,15 +70,28 @@ export const usePageSections = (sectionName?: string) => {
         updated_at: new Date().toISOString(),
       };
 
-      const { error: updateError, data: updateData } = await supabase
+      console.log('Sending update payload to Supabase:', updatePayload);
+      
+      const { error: updateError, data: updateData, status } = await supabase
         .from('page_sections')
         .update(updatePayload)
         .eq('section_name', sectionName)
         .select();
 
+      console.log('Supabase response status:', status);
+      console.log('Supabase update data:', updateData);
+
       if (updateError) {
-        console.error('Update error:', updateError);
-        setError(updateError.message);
+        const errorMsg = `Database update failed: ${updateError.message} (Code: ${updateError.code})`;
+        console.error('Update error:', errorMsg, updateError);
+        setError(errorMsg);
+        return false;
+      }
+
+      if (!updateData || updateData.length === 0) {
+        const warnMsg = 'Update completed but no data returned. The record may not have been updated.';
+        console.warn(warnMsg);
+        setError(warnMsg);
         return false;
       }
 
@@ -89,8 +104,9 @@ export const usePageSections = (sectionName?: string) => {
         .eq('section_name', sectionName);
 
       if (refreshError) {
-        console.error('Refresh error:', refreshError);
-        setError(refreshError.message);
+        const errorMsg = `Refresh failed: ${refreshError.message}`;
+        console.error('Refresh error:', errorMsg);
+        setError(errorMsg);
         return false;
       }
 
@@ -108,13 +124,15 @@ export const usePageSections = (sectionName?: string) => {
           
           return updated;
         });
+      } else {
+        console.warn('No data returned from refresh query');
       }
 
       setError(null);
       return true;
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to update section';
-      console.error('Exception in updateSection:', errorMsg);
+      console.error('Exception in updateSection:', errorMsg, err);
       setError(errorMsg);
       return false;
     }

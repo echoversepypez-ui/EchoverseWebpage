@@ -1,12 +1,18 @@
 'use client';
 
+declare global {
+  interface Window {
+    Tawk_API?: any;
+  }
+}
+
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { useChatbotOptions } from '@/hooks/useChatbotOptions';
 import { useSystemSettings } from '@/hooks/useSystemSettings';
 import { useAdminConversations } from '@/hooks/useAdminConversations';
 import { useConversationMessages } from '@/hooks/useConversationMessages';
-import { useHubSpotChat, openHubSpotWidget } from '@/hooks/useHubSpotChat';
+// previously used Tawk.to chat widget – now using internal chat support
 import { supabase } from '@/lib/supabase';
 import styles from './SupportChatbot.module.css';
 
@@ -30,8 +36,7 @@ export function SupportChatbot() {
   const { getBooleanSetting, loading: settingsLoading, refresh } = useSystemSettings();
   const { createConversation } = useAdminConversations();
   
-  // Initialize HubSpot chat
-  useHubSpotChat();
+  // using internal chat support; external widget initialization removed
   
   // State
   const [isOpen, setIsOpen] = useState(false);
@@ -54,6 +59,8 @@ export function SupportChatbot() {
   const [guestId, setGuestId] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [openingHubSpot, setOpeningHubSpot] = useState(false);
+  // whether the external Tawk.to widget is active
+  const [showTawk, setShowTawk] = useState(false);
   
   // Hook for conversation messages - will subscribe when conversationId is set
   const { messages: dbMessages, loading: messagesLoading } = useConversationMessages(conversationId);
@@ -92,6 +99,50 @@ export function SupportChatbot() {
       prevEnabledRef.current = chatbotEnabled;
     }
   }, [isAdminPage, settingsLoading]);
+
+  // when using external widget, the internal UI is suppressed.
+  // load tawk script lazily and register event callbacks
+  useEffect(() => {
+    // Toggling external widget visibility
+    if (showTawk) {
+      // add the tawk script if it hasn't been loaded
+      if (!window.Tawk_API) {
+        const s1 = document.createElement('script');
+        const s0 = document.getElementsByTagName('script')[0];
+        s1.async = true;
+        s1.src = 'https://embed.tawk.to/699d0106d737701c38a644a1/1ji6ko0f9';
+        s1.charset = 'UTF-8';
+        s1.setAttribute('crossorigin', '*');
+        s0.parentNode?.insertBefore(s1, s0);
+      }
+
+      window.Tawk_API = window.Tawk_API || {};
+
+      // show / maximize widget
+      const openCheck = setInterval(() => {
+        if (window.Tawk_API && window.Tawk_API.maximize) {
+          window.Tawk_API.showWidget && window.Tawk_API.showWidget();
+          window.Tawk_API.maximize();
+          clearInterval(openCheck);
+        }
+      }, 500);
+
+      // when widget is minimized (closed) we return to our UI
+      window.Tawk_API.onChatMinimized = () => {
+        setShowTawk(false);
+        setIsOpen(true);
+      };
+
+      return () => {
+        clearInterval(openCheck);
+      };
+    } else {
+      // if widget exists, hide it completely (no icon)
+      if (window.Tawk_API && window.Tawk_API.hideWidget) {
+        window.Tawk_API.hideWidget();
+      }
+    }
+  }, [showTawk]);
 
   // Group options by category for better organization
   const groupedOptions = options.reduce((acc: { [key: string]: CategoryGroup }, option: any) => {
@@ -275,13 +326,6 @@ export function SupportChatbot() {
     setSelectedOption(null);
   };
 
-  const openHubSpotChat = () => {
-    setOpeningHubSpot(true);
-    openHubSpotWidget();
-    setIsOpen(false);
-    setOpeningHubSpot(false);
-  };
-
   // Don't render chatbot if on admin page
   if (isAdminPage) {
     return null;
@@ -294,6 +338,11 @@ export function SupportChatbot() {
 
   // Hide chatbot if disabled (but keep component mounted to prevent flickering)
   if (!isChatbotEnabled) {
+    return null;
+  }
+
+  // show nothing while tawk widget is active - it lives outside React UI
+  if (showTawk) {
     return null;
   }
 
@@ -344,40 +393,32 @@ export function SupportChatbot() {
             <div className={styles.loading}>Loading...</div>
           ) : (
             <>
-              {/* HubSpot Quick Chat Button */}
+              {/* Primary action: start a live conversation using internal chat system */}
               <button
-                className={styles.hubspotButton}
-                onClick={openHubSpotChat}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  marginBottom: '12px',
-                  backgroundColor: '#ff5733',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#e63d1d';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 87, 51, 0.3)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#ff5733';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
+                className={styles.startChatButton}
+                onClick={() => {
+                  // open external Tawk widget instead of internal chat
+                  setShowTawk(true);
+                  setIsOpen(false); // hide our own panel while the widget runs
                 }}
               >
-                <span>🟢 Quick Chat with Support</span>
+                <span style={{ fontSize: '20px' }}>💬</span>
+                <span>Chat with Support Team</span>
               </button>
+
+              {/* Built-in support only: show FAQ label and options directly */}
+
+              <div style={{
+                fontSize: '12px',
+                fontWeight: '600',
+                color: '#666',
+                marginBottom: '8px',
+                paddingLeft: '4px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                Browse FAQs & Live Chat
+              </div>
 
               {showFallback && (
                 <div className={styles.fallbackSection}>

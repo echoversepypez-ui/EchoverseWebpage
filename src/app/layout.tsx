@@ -37,9 +37,7 @@ export default function RootLayout({
           {children}
           <SupportChatbot />
         </AuthProvider>
-        {/* HubSpot Chat Embed */}
-        <script type="text/javascript" id="hs-script-loader" async defer src="//js-na2.hs-scripts.com/245307784.js"></script>
-      </body>
+        {/* external chat embed removed; using internal support chatbot instead */}      </body>
     </html>
   );
 }
