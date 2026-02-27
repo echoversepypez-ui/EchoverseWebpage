@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 type Mode = 'login' | 'signup' | 'forgot';
 
-export default function ApplicantLoginPage() {
+function ApplicantLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>('login');
@@ -103,12 +103,12 @@ export default function ApplicantLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-purple-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 flex flex-col">
       <nav className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <Link
             href="/"
-            className="text-xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent hover:opacity-80"
+            className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent hover:opacity-80"
           >
             🎓 Echoverse
           </Link>
@@ -188,7 +188,7 @@ export default function ApplicantLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
               >
                 {loading ? 'Sending…' : 'Send reset link'}
               </button>
@@ -245,7 +245,7 @@ export default function ApplicantLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
               >
                 {loading ? 'Creating account…' : 'Create account'}
               </button>
@@ -279,7 +279,7 @@ export default function ApplicantLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
+                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
               >
                 {loading ? 'Signing in…' : 'Sign in'}
               </button>
@@ -306,5 +306,13 @@ export default function ApplicantLoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ApplicantLoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <ApplicantLoginContent />
+    </Suspense>
   );
 }
