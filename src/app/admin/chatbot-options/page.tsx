@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { AdminHeader } from '@/components/AdminHeader';
 import { useChatbotOptions } from '@/hooks/useChatbotOptions';
 import { useSystemSettings } from '@/hooks/useSystemSettings';
 import { ProtectedRoute } from '@/components/protected-route';
@@ -239,10 +240,14 @@ export default function ChatbotOptionsPage() {
 
   return (
     <ProtectedRoute>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '12px' }}>
-        <div style={{ marginBottom: '12px' }}>
-          <Link href="/admin/dashboard">← Back to Dashboard</Link>
-        </div>
+      <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-purple-50">
+        <AdminHeader 
+          title="💬 Support Chatbot Options" 
+          subtitle="Manage chatbot options and system status"
+          backHref="/admin/dashboard"
+        />
+
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '12px' }}>
 
         {/* System Status Control */}
         {!settingsLoading && (
@@ -746,6 +751,7 @@ export default function ChatbotOptionsPage() {
             )}
           </>
         )}
+        </div>
       </div>
     </ProtectedRoute>
   );

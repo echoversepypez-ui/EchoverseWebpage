@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 export interface Testimonial {
   quote: string;
@@ -41,8 +41,6 @@ const DEFAULT_TESTIMONIALS: Testimonial[] = [
   }
 ];
 
-const CARDS_PER_VIEW = 3;
-
 export function TestimonialCarousel({
   testimonials,
   loading,
@@ -52,20 +50,28 @@ export function TestimonialCarousel({
   const [carouselIndex, setCarouselIndex] = useState(0);
 
   const displayedTestimonials = testimonials.length > 0 ? testimonials : DEFAULT_TESTIMONIALS;
-  const maxIndex = Math.max(0, displayedTestimonials.length - CARDS_PER_VIEW);
+
+  // Dynamic cards per view - show more on larger screens
+  const cardsPerView = useMemo(() => {
+    if (displayedTestimonials.length === 1) return 1;
+    if (displayedTestimonials.length === 2) return 2;
+    return 3; // Default to 3 for larger sets
+  }, [displayedTestimonials.length]);
+
+  const maxIndex = Math.max(0, displayedTestimonials.length - cardsPerView);
   const currentIndex = Math.min(carouselIndex, maxIndex);
-  const visibleCards = displayedTestimonials.slice(currentIndex, currentIndex + CARDS_PER_VIEW);
+  const visibleCards = displayedTestimonials.slice(currentIndex, currentIndex + cardsPerView);
 
   const handlePrevious = () => {
-    setCarouselIndex(Math.max(0, carouselIndex - CARDS_PER_VIEW));
+    setCarouselIndex(Math.max(0, carouselIndex - cardsPerView));
   };
 
   const handleNext = () => {
-    setCarouselIndex(Math.min(maxIndex, carouselIndex + CARDS_PER_VIEW));
+    setCarouselIndex(Math.min(maxIndex, carouselIndex + cardsPerView));
   };
 
   const handleDotClick = (index: number) => {
-    setCarouselIndex(index * CARDS_PER_VIEW);
+    setCarouselIndex(index * cardsPerView);
   };
 
   const handleLoadMore = () => {
@@ -75,8 +81,9 @@ export function TestimonialCarousel({
     }
   };
 
-  const totalPages = Math.ceil(displayedTestimonials.length / CARDS_PER_VIEW);
-  const currentPage = Math.floor(currentIndex / CARDS_PER_VIEW);
+  const needsCarousel = displayedTestimonials.length > cardsPerView;
+  const totalPages = Math.ceil(displayedTestimonials.length / cardsPerView);
+  const currentPage = Math.floor(currentIndex / cardsPerView);
 
   if (loading) {
     return (
@@ -86,45 +93,70 @@ export function TestimonialCarousel({
     );
   }
 
+  // Determine grid columns based on number of visible cards
+  const getGridCols = () => {
+    if (visibleCards.length === 1) return 'grid-cols-1 max-w-md mx-auto';
+    if (visibleCards.length === 2) return 'grid-cols-1 sm:grid-cols-2';
+    return 'grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
+  };
+
   return (
     <div className="space-y-8">
       {/* Carousel */}
-      <div className="relative">
+      <div className={`relative ${needsCarousel ? 'px-12' : ''}`}>
         <div className="overflow-hidden">
-          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+          <div className={`grid gap-6 ${getGridCols()}`}>
             {visibleCards.map((testimonial: Testimonial, index: number) => (
               <div
                 key={index}
-                className="p-3 bg-white border border-gray-200 rounded-lg hover:border-purple-600 hover:shadow-lg transition-all duration-300 group h-full flex flex-col"
+                className="group relative bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden h-full flex flex-col hover:-translate-y-2"
               >
-                <div className="flex items-center gap-1 mb-2">
-                  {[...Array(testimonial.rating || 5)].map((_, i) => (
-                    <span key={i} className="text-sm">
-                      ⭐
-                    </span>
-                  ))}
-                </div>
-                <p className="text-gray-700 leading-tight mb-3 italic grow text-xs">
-                  {`"${testimonial.quote}"`}
-                </p>
-                <div className="border-t border-gray-200 pt-2 mt-auto">
-                  <p className="font-bold text-gray-900 text-xs">{testimonial.name}</p>
-                  <p className="text-purple-600 font-semibold text-xs">
-                    {testimonial.role} • {testimonial.duration}
+                {/* Gradient accent bar */}
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500"></div>
+
+                <div className="p-6 flex flex-col h-full">
+                  {/* Rating Stars */}
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(testimonial.rating || 5)].map((_, i) => (
+                      <span key={i} className="text-base">
+                        ⭐
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Quote Text */}
+                  <p className="text-gray-700 leading-relaxed mb-6 grow text-sm italic font-light">
+                    {`"${testimonial.quote}"`}
                   </p>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-100 pt-4 mt-auto">
+                    {/* Author Info */}
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
+                        {testimonial.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-gray-900 text-sm truncate">{testimonial.name}</p>
+                        <p className="text-xs text-gray-600 truncate">
+                          {testimonial.role} • {testimonial.duration}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Navigation Buttons */}
-        {displayedTestimonials.length > CARDS_PER_VIEW && (
+        {/* Navigation Buttons - Only show if carousel is needed */}
+        {needsCarousel && displayedTestimonials.length > cardsPerView && (
           <>
             <button
               onClick={handlePrevious}
               disabled={currentIndex === 0}
-              className="absolute -left-4 top-1/2 transform -translate-y-1/2 z-10 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 text-white rounded-full p-3 transition-all duration-300 hover:scale-110 disabled:cursor-not-allowed shadow-lg"
+              className="absolute -left-6 top-1/2 transform -translate-y-1/2 z-10 bg-white border-2 border-purple-500 text-purple-600 hover:bg-purple-50 disabled:border-gray-300 disabled:text-gray-300 disabled:bg-gray-50 rounded-full p-3 transition-all duration-300 hover:scale-110 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
               aria-label="Previous testimonials"
             >
               ←
@@ -132,7 +164,7 @@ export function TestimonialCarousel({
             <button
               onClick={handleNext}
               disabled={currentIndex >= maxIndex}
-              className="absolute -right-4 top-1/2 transform -translate-y-1/2 z-10 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 text-white rounded-full p-3 transition-all duration-300 hover:scale-110 disabled:cursor-not-allowed shadow-lg"
+              className="absolute -right-6 top-1/2 transform -translate-y-1/2 z-10 bg-white border-2 border-purple-500 text-purple-600 hover:bg-purple-50 disabled:border-gray-300 disabled:text-gray-300 disabled:bg-gray-50 rounded-full p-3 transition-all duration-300 hover:scale-110 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
               aria-label="Next testimonials"
             >
               →
@@ -141,15 +173,17 @@ export function TestimonialCarousel({
         )}
       </div>
 
-      {/* Carousel Dots/Indicators */}
-      {displayedTestimonials.length > CARDS_PER_VIEW && (
-        <div className="flex justify-center gap-2">
+      {/* Carousel Dots/Indicators - Only show if carousel is needed */}
+      {needsCarousel && displayedTestimonials.length > cardsPerView && (
+        <div className="flex justify-center gap-3 pt-4">
           {Array.from({ length: totalPages }).map((_, i) => (
             <button
               key={i}
               onClick={() => handleDotClick(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                i === currentPage ? 'bg-purple-600 w-8' : 'bg-gray-300 w-2 hover:bg-gray-400'
+              className={`rounded-full transition-all duration-300 ${
+                i === currentPage
+                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 w-8 h-3'
+                  : 'bg-gray-300 w-3 h-3 hover:bg-gray-400'
               }`}
               aria-label={`Go to testimonial page ${i + 1}`}
             />

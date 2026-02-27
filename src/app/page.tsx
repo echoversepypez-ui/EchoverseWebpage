@@ -3,8 +3,10 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useApplicantAuth } from '@/lib/applicant-auth-context';
 import { useJourneySteps } from '@/hooks/useProfileManagement';
 import { usePageSections } from '@/hooks/usePageSections';
+import { usePageStats } from '@/hooks/usePageStats';
 import { RequirementsSection } from '@/components/RequirementsSection';
 import { FAQSection } from '@/components/FAQSection';
 import { WhyJoinSection } from '@/components/WhyJoinSection';
@@ -20,14 +22,19 @@ interface Benefit {
 }
 
 export default function Home() {
+  const { user: applicantUser } = useApplicantAuth();
   const journeySteps = useJourneySteps();
   const { sections: pageSections, loading: sectionsLoading } = usePageSections();
+  const { stats: pageStats, loading: statsLoading } = usePageStats();
   const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [applicationLoading, setApplicationLoading] = useState(false);
+  const [applicationError, setApplicationError] = useState<string | null>(null);
+  const [applicationSuccess, setApplicationSuccess] = useState(false);
   const [visibleTestimonials, setVisibleTestimonials] = useState(6);
   const [applicationData, setApplicationData] = useState({
     name: '',
     age: '',
+    email: '',
     address: '',
     phone: '',
     educational_attainment: '',
@@ -63,6 +70,18 @@ export default function Home() {
     };
   }, []);
 
+  // Pre-fill name and email in application form when applicant is logged in and modal opens
+  useEffect(() => {
+    if (!showApplicationModal || !applicantUser) return;
+    const name = (applicantUser.user_metadata?.full_name as string)?.trim() || '';
+    const email = applicantUser.email ?? '';
+    setApplicationData((prev) => ({
+      ...prev,
+      name: prev.name || name,
+      email: prev.email || email,
+    }));
+  }, [showApplicationModal, applicantUser?.id]);
+
   const handleApplicationInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
@@ -72,14 +91,17 @@ export default function Home() {
   const handleApplicationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setApplicationLoading(true);
+    setApplicationError(null);
+    setApplicationSuccess(false);
     
     try {
-      await supabase
+      const { error } = await supabase
         .from('applications')
         .insert([
           {
             name: applicationData.name,
             age: applicationData.age,
+            email: applicationData.email,
             address: applicationData.address,
             phone: applicationData.phone,
             educational_attainment: applicationData.educational_attainment,
@@ -97,10 +119,15 @@ export default function Home() {
           },
         ]);
       
-      setShowApplicationModal(false);
+      if (error) {
+        throw error;
+      }
+      
+      setApplicationSuccess(true);
       setApplicationData({
         name: '',
         age: '',
+        email: '',
         address: '',
         phone: '',
         educational_attainment: '',
@@ -116,8 +143,16 @@ export default function Home() {
         residing_antique: '',
         agreed_to_terms: false,
       });
+      
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        setShowApplicationModal(false);
+        setApplicationSuccess(false);
+      }, 2000);
     } catch (err) {
       console.error('Error submitting application:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Failed to submit application. Please try again.';
+      setApplicationError(errorMessage);
     } finally {
       setApplicationLoading(false);
     }
@@ -150,30 +185,30 @@ export default function Home() {
           </div>
 
           {/* What We Offer - 3 columns */}
-          <div className="grid md:grid-cols-3 gap-8 mb-16">
+          <div className="grid md:grid-cols-3 gap-4 mb-8">
             {/* Column 1 */}
-            <div className="text-center p-8 bg-white rounded-2xl border-2 border-purple-100 hover:border-purple-300 hover:shadow-xl transition-all duration-300">
-              <div className="text-5xl mb-4">🎓</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Quality Education</h3>
-              <p className="text-gray-600 leading-relaxed">
+            <div className="text-center p-3 bg-white rounded-lg border border-purple-100 hover:border-purple-300 hover:shadow-md transition-all duration-300">
+              <div className="text-3xl mb-2">🎓</div>
+              <h3 className="text-sm font-bold text-gray-900 mb-1">Quality Education</h3>
+              <p className="text-xs text-gray-600 leading-tight">
                 Deliver engaging lessons to motivated students worldwide. We provide all the tools and resources you need.
               </p>
             </div>
 
             {/* Column 2 */}
-            <div className="text-center p-8 bg-white rounded-2xl border-2 border-pink-100 hover:border-pink-300 hover:shadow-xl transition-all duration-300">
-              <div className="text-5xl mb-4">💼</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Flexible Career</h3>
-              <p className="text-gray-600 leading-relaxed">
+            <div className="text-center p-3 bg-white rounded-lg border border-pink-100 hover:border-pink-300 hover:shadow-md transition-all duration-300">
+              <div className="text-3xl mb-2">💼</div>
+              <h3 className="text-sm font-bold text-gray-900 mb-1">Flexible Career</h3>
+              <p className="text-xs text-gray-600 leading-tight">
                 Work on your schedule. No 9-to-5 commitment. Full control over your hours and workload.
               </p>
             </div>
 
             {/* Column 3 */}
-            <div className="text-center p-8 bg-white rounded-2xl border-2 border-purple-100 hover:border-purple-300 hover:shadow-xl transition-all duration-300">
-              <div className="text-5xl mb-4">🚀</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Real Growth</h3>
-              <p className="text-gray-600 leading-relaxed">
+            <div className="text-center p-3 bg-white rounded-lg border border-purple-100 hover:border-purple-300 hover:shadow-md transition-all duration-300">
+              <div className="text-3xl mb-2">🚀</div>
+              <h3 className="text-sm font-bold text-gray-900 mb-1">Real Growth</h3>
+              <p className="text-xs text-gray-600 leading-tight">
                 Build your reputation, grow your earnings, and advance your career with us.
               </p>
             </div>
@@ -187,8 +222,8 @@ export default function Home() {
           <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/5 rounded-full -ml-32 -mb-32"></div>
           
           <div className="relative z-10">
-            <h3 className="text-4xl sm:text-5xl font-black mb-3 text-center">Why Thousands Love Teaching With Us 💜</h3>
-            <p className="text-center text-white/80 mb-12 text-lg max-w-2xl mx-auto">Join our thriving community of educators and unlock unlimited potential</p>
+            <h3 className="text-2xl sm:text-3xl font-black mb-2 text-center">Why Thousands Love Teaching With Us 💜</h3>
+            <p className="text-center text-white/80 mb-6 text-sm max-w-2xl mx-auto">Join our thriving community of educators and unlock unlimited potential</p>
             
             {sectionsLoading ? (
               <div className="text-center py-8">
@@ -283,7 +318,7 @@ export default function Home() {
 
 
       {/* Statistics Section - Premium Dark */}
-      <section className="relative py-32 bg-linear-to-br from-slate-950 via-purple-900 to-slate-950 text-white overflow-hidden">
+      <section className="relative py-8 bg-linear-to-br from-slate-950 via-purple-900 to-slate-950 text-white overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl"></div>
@@ -291,51 +326,41 @@ export default function Home() {
         </div>
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-20 space-y-4">
-            <h2 className="text-5xl sm:text-6xl font-black">Trusted by Educators</h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">Join our thriving global community of successful language teachers</p>
-            <div className="w-24 h-1 bg-linear-to-r from-purple-400 to-pink-400 mx-auto rounded-full"></div>
+          <div className="text-center mb-6 space-y-2">
+            <h2 className="text-2xl sm:text-3xl font-black">Trusted by Educators</h2>
+            <p className="text-sm text-gray-300 max-w-2xl mx-auto">Join our thriving global community of successful language teachers</p>
+            <div className="w-16 h-0.5 bg-linear-to-r from-purple-400 to-pink-400 mx-auto rounded-full"></div>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="p-8 bg-white/10 backdrop-blur border border-white/20 rounded-2xl hover:border-purple-400 hover:bg-white/15 transition-all duration-300 group">
-              <div className="text-5xl font-black bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 group-hover:scale-110 transition-transform">500+</div>
-              <h3 className="text-xl font-bold mb-1">Active Teachers</h3>
-              <p className="text-gray-300">Growing every single day</p>
-              <div className="mt-4 h-1 w-8 bg-linear-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all rounded-full"></div>
+          {statsLoading ? (
+            <div className="text-center text-gray-300">Loading statistics...</div>
+          ) : pageStats.length === 0 ? (
+            <div className="text-center text-gray-300">No statistics available</div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {pageStats.map((stat) => (
+                <div key={stat.stat_key} className="p-3 bg-white/10 backdrop-blur border border-white/20 rounded-lg hover:border-purple-400 hover:bg-white/15 transition-all duration-300 group">
+                  <div className="text-3xl font-black bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform">{stat.stat_value}</div>
+                  <h3 className="text-sm font-bold mb-0.5">{stat.stat_label}</h3>
+                  <p className="text-xs text-gray-300">{stat.stat_description}</p>
+                  <div className="mt-2 h-0.5 w-6 bg-linear-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all rounded-full"></div>
+                </div>
+              ))}
             </div>
-            
-            <div className="p-8 bg-white/10 backdrop-blur border border-white/20 rounded-2xl hover:border-purple-400 hover:bg-white/15 transition-all duration-300 group">
-              <div className="text-5xl font-black bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 group-hover:scale-110 transition-transform">12,000+</div>
-              <h3 className="text-xl font-bold mb-1">Students Taught</h3>
-              <p className="text-gray-300">From 50+ countries worldwide</p>
-              <div className="mt-4 h-1 w-8 bg-linear-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all rounded-full"></div>
-            </div>
-            
-            <div className="p-8 bg-white/10 backdrop-blur border border-white/20 rounded-2xl hover:border-purple-400 hover:bg-white/15 transition-all duration-300 group">
-              <div className="text-5xl font-black bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 group-hover:scale-110 transition-transform">$2.5M+</div>
-              <h3 className="text-xl font-bold mb-1">Total Earnings Paid</h3>
-              <p className="text-gray-300">Straight to our teachers</p>
-              <div className="mt-4 h-1 w-8 bg-linear-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all rounded-full"></div>
-            </div>
-            
-            <div className="p-8 bg-white/10 backdrop-blur border border-white/20 rounded-2xl hover:border-purple-400 hover:bg-white/15 transition-all duration-300 group">
-              <div className="text-5xl font-black bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 group-hover:scale-110 transition-transform">4.9/5 ⭐</div>
-              <h3 className="text-xl font-bold mb-1">Average Rating</h3>
-              <p className="text-gray-300">Based on student reviews</p>
-              <div className="mt-4 h-1 w-8 bg-linear-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all rounded-full"></div>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-8 bg-linear-to-br from-slate-50 via-white to-purple-50">
+      <section className="py-16 bg-linear-to-br from-slate-50 via-white to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-6 space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-black text-gray-900">What Teachers Say</h2>
-            <p className="text-sm text-gray-600 max-w-2xl mx-auto">Real stories from successful educators in our community</p>
-            <div className="w-16 h-0.5 bg-linear-to-r from-purple-600 to-pink-600 mx-auto rounded-full"></div>
+          <div className="text-center mb-12 space-y-4">
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900">What Teachers Say</h2>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto font-light">Real stories from successful educators in our community</p>
+            <div className="flex justify-center gap-2">
+              <div className="w-12 h-0.5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full"></div>
+              <div className="w-12 h-0.5 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full"></div>
+            </div>
           </div>
           
           {(() => {
@@ -371,7 +396,7 @@ export default function Home() {
           ) : journeySteps.error ? (
             <div className="text-center py-12 text-red-600">Error loading journey steps: {journeySteps.error}</div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 md:gap-5 mb-12 relative">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-2 mb-6 relative">
               {/* Connecting Lines */}
               <div className="hidden lg:block absolute top-28 left-0 right-0 h-1 bg-linear-to-r from-purple-600 via-pink-600 to-green-600 -z-10"></div>
 
@@ -494,7 +519,7 @@ export default function Home() {
       <FAQSection />
 
       {/* Final CTA Section - Premium */}
-      <section className="relative py-32 bg-linear-to-br from-slate-950 via-purple-900 to-slate-950 text-white overflow-hidden">
+      <section className="relative py-8 bg-linear-to-br from-slate-950 via-purple-900 to-slate-950 text-white overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
@@ -502,22 +527,22 @@ export default function Home() {
         </div>
         
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <div className="space-y-6">
-            <h2 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-tight">
+          <div className="space-y-3">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight">
               Ready to Transform <span className="bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Your Teaching Career?</span>
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-sm text-gray-300 max-w-2xl mx-auto leading-relaxed">
               Join 500+ educators earning premium income with Echoverse. <span className="font-bold">Quick approval</span> • <span className="font-bold">100% flexible</span> • <span className="font-bold">24/7 support</span>
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-              <button onClick={() => setShowApplicationModal(true)} className="group relative px-10 py-5 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
+            <div className="flex flex-col sm:flex-row gap-2 justify-center pt-4">
+              <button onClick={() => setShowApplicationModal(true)} className="group relative px-6 py-2 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold text-sm hover:shadow-lg transition-all duration-300 transform hover:scale-105 overflow-hidden">
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   Start Your Journey Now <span className="group-hover:translate-x-1 transition">🚀</span>
                 </span>
                 <div className="absolute inset-0 bg-linear-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               </button>
-              <Link href="/teachers-profile" className="px-10 py-5 border-2 border-purple-400 text-white rounded-xl font-bold text-lg hover:bg-white/10 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+              <Link href="/teachers-profile" className="px-6 py-2 border-2 border-purple-400 text-white rounded-lg font-bold text-sm hover:bg-white/10 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
                 Explore Opportunities
               </Link>
             </div>
@@ -543,6 +568,11 @@ export default function Home() {
             </div>
             
             <form onSubmit={handleApplicationSubmit} className="space-y-6 p-8">
+              {applicantUser && (
+                <p className="text-sm text-purple-600 font-medium">
+                  Logged in as {applicantUser.user_metadata?.full_name || applicantUser.email}. Name and email are pre-filled.
+                </p>
+              )}
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">Name *</label>
@@ -552,6 +582,11 @@ export default function Home() {
                   <label className="block text-sm font-semibold text-gray-900 mb-2">Age *</label>
                   <input type="number" name="age" value={applicationData.age} onChange={handleApplicationInputChange} required placeholder="Age" className="w-full border-2 border-gray-300 rounded-lg px-4 py-2 text-gray-900 focus:outline-none focus:border-purple-600 transition" />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Email *</label>
+                <input type="email" name="email" value={applicationData.email} onChange={handleApplicationInputChange} required placeholder="your.email@example.com" className="w-full border-2 border-gray-300 rounded-lg px-4 py-2 text-gray-900 focus:outline-none focus:border-purple-600 transition" />
               </div>
 
               <div>
@@ -722,7 +757,27 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              {!applicationData.agreed_to_terms && (
+              {applicationError && (
+              <div className="flex items-start gap-3 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
+                <span className="text-red-600 font-bold text-lg mt-0.5">❌</span>
+                <div>
+                  <p className="text-red-700 text-sm font-semibold">Submission Error</p>
+                  <p className="text-red-600 text-xs mt-1">{applicationError}</p>
+                </div>
+              </div>
+            )}
+
+            {applicationSuccess && (
+              <div className="flex items-start gap-3 p-4 bg-green-50 border-2 border-green-300 rounded-lg">
+                <span className="text-green-600 font-bold text-lg mt-0.5">✅</span>
+                <div>
+                  <p className="text-green-700 text-sm font-semibold">Success!</p>
+                  <p className="text-green-600 text-xs mt-1">Your application has been submitted successfully. We'll review it and contact you soon!</p>
+                </div>
+              </div>
+            )}
+
+            {!applicationData.agreed_to_terms && (
                 <div className="flex items-start gap-3 p-4 bg-red-50 border-2 border-red-300 rounded-lg">
                   <span className="text-red-600 font-bold text-lg mt-0.5">⚠️</span>
                   <div>

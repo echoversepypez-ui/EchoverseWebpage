@@ -2,14 +2,17 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { AdminHeader } from '@/components/AdminHeader';
 import { usePageSections } from '@/hooks/usePageSections';
+import { usePageStats } from '@/hooks/usePageStats';
 import { useTestimonials } from '@/hooks/useTestimonials';
 import { ProtectedRoute } from '@/components/protected-route';
 
-type TabType = 'how_it_works' | 'requirements' | 'faq' | 'why_join' | 'testimonials';
+type TabType = 'how_it_works' | 'requirements' | 'faq' | 'why_join' | 'testimonials' | 'contacts' | 'contact_info' | 'page_stats';
 
 export default function PageContentPage() {
   const { sections, loading, error, updateSection } = usePageSections();
+  const { stats: pageStats, updateStat: updatePageStat, loading: statsLoading } = usePageStats();
   const [activeTab, setActiveTab] = useState<TabType>('how_it_works');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -52,33 +55,17 @@ export default function PageContentPage() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-purple-50">
-        {/* Navigation */}
-        <nav className="bg-white shadow-md sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <Link href="/admin/dashboard" className="text-2xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent hover:opacity-80 transition">
-              🎓 Echoverse Admin
-            </Link>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/admin/dashboard"
-                className="px-4 py-2 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-pink-700 transition shadow-md"
-              >
-                Dashboard
-              </Link>
-            </div>
-          </div>
-        </nav>
+        <AdminHeader 
+          title="📄 Edit Page Content" 
+          subtitle="Manage the content displayed on your home page sections"
+          backHref="/admin/dashboard"
+        />
 
         {/* Page Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">Edit Page Content</h1>
-            <p className="text-gray-600">Manage the content displayed on your home page sections</p>
-          </div>
-
           {/* Tabs */}
           <div className="flex flex-wrap gap-2 mb-8 border-b-2 border-gray-300">
-            {(['how_it_works', 'requirements', 'faq', 'why_join', 'testimonials'] as TabType[]).map((tab) => (
+            {(['how_it_works', 'requirements', 'faq', 'why_join', 'testimonials', 'contacts', 'contact_info', 'page_stats'] as TabType[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -93,12 +80,15 @@ export default function PageContentPage() {
                 {tab === 'faq' && '❓ FAQ'}
                 {tab === 'why_join' && '🎯 Why Join'}
                 {tab === 'testimonials' && '💬 Testimonials'}
+                {tab === 'contacts' && '📋 Contact Reasons'}
+                {tab === 'contact_info' && '📞 Contact Info'}
+                {tab === 'page_stats' && '📊 Page Stats'}
               </button>
             ))}
           </div>
 
           {/* Loading State */}
-          {loading && (
+          {(loading || statsLoading) && (
             <div className="text-center py-12">
               <p className="text-gray-600 text-lg">Loading section content...</p>
             </div>
@@ -111,8 +101,8 @@ export default function PageContentPage() {
             </div>
           )}
 
-          {/* Content Editor */}
-          {!loading && section && (
+          {/* Content Editor - Regular Sections */}
+          {!loading && section && activeTab !== 'page_stats' && (
             <div className="bg-white rounded-xl shadow-xl p-8 border border-purple-100">
               {/* Success/Error Message */}
               {message && (
@@ -151,6 +141,37 @@ export default function PageContentPage() {
               {activeTab === 'testimonials' && (
                 <TestimonialsEditor section={section} onUpdate={updateSection} setSaving={setSaving} setMessage={setMessage} />
               )}
+
+              {/* Contacts Section - Why Contact Us */}
+              {activeTab === 'contacts' && (
+                <ContactsEditor section={section} onUpdate={updateSection} setSaving={setSaving} setMessage={setMessage} />
+              )}
+
+              {/* Contact Info Section */}
+              {activeTab === 'contact_info' && (
+                <ContactInfoEditor section={section} onUpdate={updateSection} setSaving={setSaving} setMessage={setMessage} />
+              )}
+            </div>
+          )}
+
+          {/* Content Editor - Page Stats */}
+          {!statsLoading && activeTab === 'page_stats' && (
+            <div className="bg-white rounded-xl shadow-xl p-8 border border-purple-100">
+              {/* Success/Error Message */}
+              {message && (
+                <div
+                  className={`mb-6 p-4 rounded-lg font-semibold ${
+                    message.type === 'success'
+                      ? 'bg-green-50 text-green-800 border border-green-200'
+                      : 'bg-red-50 text-red-800 border border-red-200'
+                  }`}
+                >
+                  {message.text}
+                </div>
+              )}
+
+              {/* Page Stats Section */}
+              <PageStatsEditor stats={pageStats} onUpdate={updatePageStat} setSaving={setSaving} setMessage={setMessage} />
             </div>
           )}
         </div>
@@ -1070,6 +1091,395 @@ function TestimonialsEditor({
           )}
         </>
       )}
+    </div>
+  );
+}
+
+// Contacts Editor Component - Why Contact Us
+function ContactsEditor({
+  section,
+  onUpdate,
+  setSaving,
+  setMessage,
+}: {
+  section: any;
+  onUpdate: (name: string, updates: any) => Promise<boolean>;
+  setSaving: (s: boolean) => void;
+  setMessage: (m: any) => void;
+}) {
+  const [localItems, setLocalItems] = useState(section?.content?.items || []);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleItemChange = (index: number, field: string, value: string) => {
+    const newItems = [...localItems];
+    newItems[index] = { ...newItems[index], [field]: value };
+    setLocalItems(newItems);
+  };
+
+  const handleAddItem = () => {
+    setLocalItems([...localItems, { icon: '✨', title: '', description: '' }]);
+  };
+
+  const handleRemoveItem = (index: number) => {
+    setLocalItems(localItems.filter((_: any, i: number) => i !== index));
+  };
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    setSaving(true);
+    setMessage(null);
+
+    const success = await onUpdate('contacts', {
+      title: section.title,
+      subtitle: section.subtitle,
+      content: { items: localItems },
+    });
+
+    setSaving(false);
+    setIsLoading(false);
+
+    if (success) {
+      setMessage({ type: 'success', text: '✅ Contact reasons updated successfully!' });
+      setTimeout(() => setMessage(null), 3000);
+    } else {
+      setMessage({ type: 'error', text: '❌ Failed to save changes.' });
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-lg p-8">
+      <h2 className="text-2xl font-bold mb-6">Edit Contact Reasons</h2>
+
+      <div className="mb-6">
+        <label className="block text-sm font-semibold mb-2">Title</label>
+        <input
+          type="text"
+          value={section?.title || ''}
+          onChange={(e) => {
+            section.title = e.target.value;
+          }}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+          placeholder="Section title"
+        />
+      </div>
+
+      <div className="mb-6">
+        <label className="block text-sm font-semibold mb-2">Subtitle</label>
+        <input
+          type="text"
+          value={section?.subtitle || ''}
+          onChange={(e) => {
+            section.subtitle = e.target.value;
+          }}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+          placeholder="Section subtitle"
+        />
+      </div>
+
+      <div className="space-y-4 mb-6">
+        {localItems.map((item: any, index: number) => (
+          <div key={index} className="border border-gray-200 rounded-lg p-4">
+            <div className="grid grid-cols-4 gap-4 mb-2">
+              <input
+                type="text"
+                value={item.icon}
+                onChange={(e) => handleItemChange(index, 'icon', e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded text-center"
+                placeholder="Icon"
+                maxLength={2}
+              />
+              <input
+                type="text"
+                value={item.title}
+                onChange={(e) => handleItemChange(index, 'title', e.target.value)}
+                className="col-span-3 px-3 py-2 border border-gray-300 rounded"
+                placeholder="Title"
+              />
+            </div>
+            <input
+              type="text"
+              value={item.description}
+              onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded mb-2"
+              placeholder="Description"
+            />
+            <button
+              onClick={() => handleRemoveItem(index)}
+              className="px-3 py-1 bg-red-50 text-red-600 border border-red-300 rounded text-sm hover:bg-red-100"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={handleAddItem}
+        className="mb-6 px-4 py-2 bg-green-50 text-green-600 border border-green-300 rounded-lg font-semibold hover:bg-green-100"
+      >
+        + Add Reason
+      </button>
+
+      <button
+        onClick={handleSave}
+        disabled={isLoading}
+        className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:shadow-lg transition disabled:opacity-50"
+      >
+        {isLoading ? 'Saving...' : 'Save Changes'}
+      </button>
+    </div>
+  );
+}
+
+// Contact Info Editor Component
+function ContactInfoEditor({
+  section,
+  onUpdate,
+  setSaving,
+  setMessage,
+}: {
+  section: any;
+  onUpdate: (name: string, updates: any) => Promise<boolean>;
+  setSaving: (s: boolean) => void;
+  setMessage: (m: any) => void;
+}) {
+  const [localInfo, setLocalInfo] = useState(section?.content?.info || []);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleInfoChange = (index: number, field: string, value: string) => {
+    const newInfo = [...localInfo];
+    newInfo[index] = { ...newInfo[index], [field]: value };
+    setLocalInfo(newInfo);
+  };
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    setSaving(true);
+    setMessage(null);
+
+    const success = await onUpdate('contact_info', {
+      title: section.title,
+      subtitle: section.subtitle,
+      content: { info: localInfo },
+    });
+
+    setSaving(false);
+    setIsLoading(false);
+
+    if (success) {
+      setMessage({ type: 'success', text: '✅ Contact info updated successfully!' });
+      setTimeout(() => setMessage(null), 3000);
+    } else {
+      setMessage({ type: 'error', text: '❌ Failed to save changes.' });
+    }
+  };
+
+  return (
+    <div className="bg-white rounded-lg p-8">
+      <h2 className="text-2xl font-bold mb-6">Edit Contact Information</h2>
+
+      <div className="mb-6">
+        <label className="block text-sm font-semibold mb-2">Title</label>
+        <input
+          type="text"
+          value={section?.title || ''}
+          onChange={(e) => {
+            section.title = e.target.value;
+          }}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+          placeholder="Section title"
+        />
+      </div>
+
+      <div className="mb-6">
+        <label className="block text-sm font-semibold mb-2">Subtitle</label>
+        <input
+          type="text"
+          value={section?.subtitle || ''}
+          onChange={(e) => {
+            section.subtitle = e.target.value;
+          }}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+          placeholder="Section subtitle"
+        />
+      </div>
+
+      <div className="space-y-4 mb-6">
+        {localInfo.map((info: any, index: number) => (
+          <div key={index} className="border border-gray-200 rounded-lg p-4">
+            <div className="grid grid-cols-2 gap-4 mb-2">
+              <input
+                type="text"
+                value={info.icon}
+                onChange={(e) => handleInfoChange(index, 'icon', e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded text-center"
+                placeholder="Icon"
+                maxLength={2}
+              />
+              <input
+                type="text"
+                value={info.label}
+                onChange={(e) => handleInfoChange(index, 'label', e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded"
+                placeholder="Label (e.g., Email)"
+              />
+            </div>
+            <textarea
+              value={info.details}
+              onChange={(e) => handleInfoChange(index, 'details', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded"
+              placeholder="Details (use line breaks for multiple lines)"
+              rows={3}
+            />
+          </div>
+        ))}
+      </div>
+
+      <button
+        onClick={handleSave}
+        disabled={isLoading}
+        className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:shadow-lg transition disabled:opacity-50"
+      >
+        {isLoading ? 'Saving...' : 'Save Changes'}
+      </button>
+    </div>
+  );
+}
+// Page Stats Editor Component
+function PageStatsEditor({
+  stats,
+  onUpdate,
+  setSaving,
+  setMessage,
+}: {
+  stats: any[];
+  onUpdate: (statKey: string, updates: any) => Promise<boolean>;
+  setSaving: (s: boolean) => void;
+  setMessage: (m: any) => void;
+}) {
+  const [localStats, setLocalStats] = useState(stats);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleStatChange = (index: number, field: string, value: string) => {
+    const newStats = [...localStats];
+    newStats[index] = { ...newStats[index], [field]: value };
+    setLocalStats(newStats);
+  };
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    setSaving(true);
+    setMessage(null);
+    
+    try {
+      let allSuccessful = true;
+      
+      for (const stat of localStats) {
+        const success = await onUpdate(stat.stat_key, {
+          stat_value: stat.stat_value,
+          stat_label: stat.stat_label,
+          stat_description: stat.stat_description,
+          display_order: stat.display_order,
+        });
+        
+        if (!success) {
+          allSuccessful = false;
+          break;
+        }
+      }
+      
+      setSaving(false);
+      setIsLoading(false);
+      
+      if (allSuccessful) {
+        setMessage({ type: 'success', text: '✅ Page statistics updated successfully!' });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: 'error', text: '❌ Failed to save some statistics. Please try again.' });
+      }
+    } catch (error) {
+      console.error('Save error:', error);
+      setSaving(false);
+      setIsLoading(false);
+      setMessage({ type: 'error', text: `❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}` });
+    }
+  };
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-6">Page Statistics (Trusted by Educators)</h2>
+      <p className="text-gray-600 mb-6">Edit the statistics displayed on the home page in the "Trusted by Educators" section.</p>
+
+      <div className="space-y-6 mb-8">
+        {localStats && localStats.length > 0 ? (
+          localStats.map((stat: any, i: number) => (
+            <div key={stat.stat_key} className="border border-gray-300 rounded-lg p-6 bg-gray-50">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">Stat Value (e.g., 500+, 12,000+)</label>
+                  <input
+                    type="text"
+                    value={stat.stat_value}
+                    onChange={(e) => handleStatChange(i, 'stat_value', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+                    disabled={isLoading}
+                    placeholder="e.g., 500+"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-black mb-2">Label</label>
+                  <input
+                    type="text"
+                    value={stat.stat_label}
+                    onChange={(e) => handleStatChange(i, 'stat_label', e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+                    disabled={isLoading}
+                    placeholder="e.g., Active Teachers"
+                  />
+                </div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-black mb-2">Description</label>
+                <input
+                  type="text"
+                  value={stat.stat_description}
+                  onChange={(e) => handleStatChange(i, 'stat_description', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+                  disabled={isLoading}
+                  placeholder="e.g., Growing every single day"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-black mb-2">Display Order</label>
+                <input
+                  type="number"
+                  value={stat.display_order}
+                  onChange={(e) => handleStatChange(i, 'display_order', e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black"
+                  disabled={isLoading}
+                  min="1"
+                />
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="border border-yellow-300 rounded-lg p-6 bg-yellow-50">
+            <p className="text-yellow-800 font-semibold">⚠️ No statistics found. Please add statistics to this section.</p>
+          </div>
+        )}
+      </div>
+
+      <button
+        onClick={handleSave}
+        disabled={isLoading}
+        className={`${
+          isLoading
+            ? 'bg-gray-600 cursor-not-allowed'
+            : 'bg-black hover:bg-gray-800'
+        } text-white px-8 py-3 rounded-lg font-bold transition`}
+      >
+        {isLoading ? 'Saving...' : 'Save Changes'}
+      </button>
     </div>
   );
 }

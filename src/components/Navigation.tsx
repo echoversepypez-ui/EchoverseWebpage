@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useApplicantAuth } from '@/lib/applicant-auth-context';
 
 interface NavLink {
   label: string;
@@ -14,7 +16,16 @@ interface NavigationProps {
 }
 
 export const Navigation = ({ activeLink = '' }: NavigationProps) => {
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, displayName, isLoading: applicantLoading, signOut } = useApplicantAuth();
+  const isApplicantLoggedIn = !!user;
+
+  const handleLogout = () => {
+    signOut();
+    setMobileMenuOpen(false);
+    router.push('/');
+  };
 
   const mainLinks: NavLink[] = [
     { label: 'Home', href: '/', active: activeLink === 'home' },
@@ -49,6 +60,44 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
                 {link.label}
               </Link>
             ))}
+            {/* Applicant: profile + dashboard + logout, or Login / Sign up */}
+            <div className="ml-4 pl-4 border-l border-gray-200 flex items-center gap-2">
+              {!applicantLoading && isApplicantLoggedIn ? (
+                <>
+                  <span className="text-sm text-gray-600 truncate max-w-[120px]" title={user.email ?? ''}>
+                    Hi, {displayName || 'Applicant'}
+                  </span>
+                  <Link
+                    href="/applicant/dashboard"
+                    className="px-4 py-2 rounded-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-gray-100 transition-all duration-300"
+                  >
+                    My applications
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="px-4 py-2 rounded-lg font-semibold text-white bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-lg transition-all duration-300"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/applicant/login"
+                    className="px-4 py-2 rounded-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-gray-100 transition-all duration-300"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/applicant/login"
+                    className="px-4 py-2 rounded-lg font-semibold text-white bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-lg transition-all duration-300 rounded-lg"
+                  >
+                    Sign up
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -90,6 +139,44 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
                 {link.label}
               </Link>
             ))}
+            <div className="pt-3 mt-3 border-t border-gray-200 flex flex-col gap-2 px-4">
+              {!applicantLoading && isApplicantLoggedIn ? (
+                <>
+                  <p className="text-sm text-gray-600 truncate px-1">Hi, {displayName || 'Applicant'}</p>
+                  <Link
+                    href="/applicant/dashboard"
+                    className="py-2.5 text-center rounded-lg font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    My applications
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={handleLogout}
+                    className="py-2.5 rounded-lg font-semibold text-white bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/applicant/login"
+                    className="flex-1 py-2.5 text-center rounded-lg font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/applicant/login"
+                    className="flex-1 py-2.5 text-center rounded-lg font-semibold text-white bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Sign up
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         )}
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { AdminHeader } from '@/components/AdminHeader';
 import { useTeachersProfiles, useAdminProfiles, useStaffProfiles, useJourneySteps, JourneyStep, TeacherProfile, AdminProfile, StaffProfile } from '@/hooks/useProfileManagement';
 
 export default function ManageProfiles() {
@@ -134,14 +135,14 @@ export default function ManageProfiles() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-purple-50">
+      <AdminHeader 
+        title="👨‍🏫 Teacher Profiles" 
+        subtitle="Edit, add, and manage all profiles and journey steps"
+        backHref="/admin/dashboard"
+      />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Header */}
-          <div className="bg-linear-to-r from-purple-600 to-pink-600 px-8 py-6">
-            <h1 className="text-3xl font-bold text-white">Profile Management</h1>
-            <p className="text-purple-100 mt-2">Edit, add, and manage all profiles and journey steps</p>
-          </div>
 
           {/* Tabs */}
           <div className="flex border-b bg-white sticky top-0 z-10 flex-wrap">

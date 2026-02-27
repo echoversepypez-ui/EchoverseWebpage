@@ -207,27 +207,45 @@ export default function AboutPage() {
       {/* Trust Indicators */}
       <section className="bg-linear-to-br from-purple-600 to-pink-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-center mb-16">Why Teachers Trust Echoverse</h2>
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="bg-white bg-opacity-15 backdrop-blur-md p-8 rounded-xl border border-white border-opacity-30 hover:border-opacity-60 hover:bg-opacity-20 transition-all duration-300">
-              <div className="text-5xl font-bold mb-4">🔒</div>
-              <p className="font-bold text-lg mb-3 text-white">Secure Platform</p>
-              <p className="text-sm text-white leading-relaxed">SSL encrypted & secure payment processing with industry-leading security standards</p>
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold mb-3">Why Teachers Trust Echoverse</h2>
+            <p className="text-sm sm:text-base text-purple-100 max-w-2xl mx-auto">
+              Clear protections for both teachers and students, explained in plain language so you
+              can quickly see how we keep your work safe.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+            <div className="bg-white text-slate-900 p-7 rounded-xl shadow-md shadow-purple-900/30 border border-purple-200/70">
+              <div className="text-4xl mb-3">🔒</div>
+              <p className="font-semibold text-base mb-2">Secure Platform</p>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                SSL-encrypted classrooms and secure payment processing that follow industry-best
+                security practices.
+              </p>
             </div>
-            <div className="bg-white bg-opacity-15 backdrop-blur-md p-8 rounded-xl border border-white border-opacity-30 hover:border-opacity-60 hover:bg-opacity-20 transition-all duration-300">
-              <div className="text-5xl font-bold mb-4">🛡️</div>
-              <p className="font-bold text-lg mb-3 text-white">Background Verified</p>
-              <p className="text-sm text-white leading-relaxed">All teachers and staff fully vetted with comprehensive background checks</p>
+            <div className="bg-white text-slate-900 p-7 rounded-xl shadow-md shadow-purple-900/30 border border-purple-200/70">
+              <div className="text-4xl mb-3">🛡️</div>
+              <p className="font-semibold text-base mb-2">Background Verified</p>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                Every teacher and staff member passes ID and background checks before working on the
+                platform.
+              </p>
             </div>
-            <div className="bg-white bg-opacity-15 backdrop-blur-md p-8 rounded-xl border border-white border-opacity-30 hover:border-opacity-60 hover:bg-opacity-20 transition-all duration-300">
-              <div className="text-5xl font-bold mb-4">📜</div>
-              <p className="font-bold text-lg mb-3 text-white">Professional Certified</p>
-              <p className="text-sm text-white leading-relaxed">TESOL, CELTA & internationally certified educators</p>
+            <div className="bg-white text-slate-900 p-7 rounded-xl shadow-md shadow-purple-900/30 border border-purple-200/70">
+              <div className="text-4xl mb-3">📜</div>
+              <p className="font-semibold text-base mb-2">Professionally Certified</p>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                TESOL, CELTA, and other internationally recognized certifications from our teaching
+                community.
+              </p>
             </div>
-            <div className="bg-white bg-opacity-15 backdrop-blur-md p-8 rounded-xl border border-white border-opacity-30 hover:border-opacity-60 hover:bg-opacity-20 transition-all duration-300">
-              <div className="text-5xl font-bold mb-4">✅</div>
-              <p className="font-bold text-lg mb-3 text-white">Trusted Since 2020</p>
-              <p className="text-sm text-white leading-relaxed">+10,000 successful teacher-student matches & growing daily</p>
+            <div className="bg-white text-slate-900 p-7 rounded-xl shadow-md shadow-purple-900/30 border border-purple-200/70">
+              <div className="text-4xl mb-3">✅</div>
+              <p className="font-semibold text-base mb-2">Trusted Since 2020</p>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                10,000+ successful teacher–student matches and consistently high satisfaction
+                ratings.
+              </p>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { ApplicantAuthProvider } from "@/lib/applicant-auth-context";
 import { Navigation } from "@/components/Navigation";
 import { SupportChatbot } from "@/components/SupportChatbot";
 
@@ -33,9 +34,11 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <AuthProvider>
-          <Navigation />
-          {children}
-          <SupportChatbot />
+          <ApplicantAuthProvider>
+            <Navigation />
+            {children}
+            <SupportChatbot />
+          </ApplicantAuthProvider>
         </AuthProvider>
         {/* external chat embed removed; using internal support chatbot instead */}      </body>
     </html>
