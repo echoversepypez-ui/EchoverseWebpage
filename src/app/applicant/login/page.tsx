@@ -112,14 +112,14 @@ function ApplicantLoginContent() {
           >
             🎓 Echoverse
           </Link>
-          <Link href="/" className="text-purple-600 hover:text-pink-600 font-medium text-sm">
+          <Link href="/" className="text-purple-600 hover:text-pink-600 font-medium text-sm py-2 px-3 rounded-lg hover:bg-gray-100 transition">
             ← Back to Home
           </Link>
         </div>
       </nav>
 
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-purple-100 p-8">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-purple-100 p-6 sm:p-8">
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Applicant Portal</h1>
             <p className="text-gray-600 text-sm">
@@ -132,7 +132,7 @@ function ApplicantLoginContent() {
             <button
               type="button"
               onClick={() => { setMode('login'); setError(null); setMessage(null); }}
-              className={`flex-1 py-2 rounded-md text-sm font-medium transition ${
+              className={`flex-1 py-3 rounded-md text-sm font-medium transition ${
                 mode === 'login' ? 'bg-white text-purple-600 shadow' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -141,7 +141,7 @@ function ApplicantLoginContent() {
             <button
               type="button"
               onClick={() => { setMode('signup'); setError(null); setMessage(null); }}
-              className={`flex-1 py-2 rounded-md text-sm font-medium transition ${
+              className={`flex-1 py-3 rounded-md text-sm font-medium transition ${
                 mode === 'signup' ? 'bg-white text-purple-600 shadow' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -181,14 +181,14 @@ function ApplicantLoginContent() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base"
                   placeholder="you@example.com"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
+                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50 text-base min-h-[52px]"
               >
                 {loading ? 'Sending…' : 'Send reset link'}
               </button>
@@ -202,7 +202,7 @@ function ApplicantLoginContent() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base"
                   placeholder="Jane Doe"
                 />
               </div>
@@ -214,7 +214,7 @@ function ApplicantLoginContent() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base"
                   placeholder="you@example.com"
                 />
               </div>
@@ -226,7 +226,7 @@ function ApplicantLoginContent() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base"
                   placeholder="••••••••"
                 />
               </div>
@@ -238,14 +238,14 @@ function ApplicantLoginContent() {
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base"
                   placeholder="••••••••"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
+                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50 text-base min-h-[52px]"
               >
                 {loading ? 'Creating account…' : 'Create account'}
               </button>
@@ -260,7 +260,7 @@ function ApplicantLoginContent() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base"
                   placeholder="you@example.com"
                 />
               </div>
@@ -272,14 +272,14 @@ function ApplicantLoginContent() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base"
                   placeholder="••••••••"
                 />
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50"
+                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-pink-700 transition disabled:opacity-50 text-base min-h-[52px]"
               >
                 {loading ? 'Signing in…' : 'Sign in'}
               </button>

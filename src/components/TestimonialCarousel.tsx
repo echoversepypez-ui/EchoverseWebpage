@@ -196,7 +196,7 @@ export function TestimonialCarousel({
         <div className="flex justify-center">
           <button
             onClick={handleLoadMore}
-            className="px-8 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
           >
             Load More Testimonials
           </button>

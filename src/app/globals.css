@@ -7,13 +7,6 @@
   --font-geist-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -52,28 +45,28 @@ a, button {
 /* Mobile-optimized typography */
 @media (max-width: 640px) {
   h1 {
-    @apply text-2xl sm:text-3xl;
+    font-size: 1.5rem;
     line-height: 1.2;
   }
   
   h2 {
-    @apply text-xl sm:text-2xl;
+    font-size: 1.25rem;
     line-height: 1.3;
   }
   
   h3 {
-    @apply text-lg sm:text-xl;
+    font-size: 1.125rem;
     line-height: 1.3;
   }
   
   p {
-    @apply text-sm sm:text-base;
+    font-size: 0.875rem;
     line-height: 1.6;
   }
   
   /* Better spacing on mobile */
   section {
-    @apply py-12 px-4 sm:px-6 sm:py-16;
+    padding: 3rem 1rem;
   }
   
   /* Mobile-friendly form elements */
@@ -85,13 +78,52 @@ a, button {
   
   /* Improve readability on small screens */
   .max-w-7xl {
-    @apply px-4 sm:px-6 lg:px-8;
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 }
 
 @media (min-width: 641px) {
   section {
-    @apply py-16 px-6 sm:py-20;
+    padding: 4rem 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  h1 {
+    font-size: 1.875rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+  }
+  
+  p {
+    font-size: 1rem;
+  }
+  
+  section {
+    padding: 4rem 1.5rem;
+  }
+  
+  .max-w-7xl {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  section {
+    padding: 5rem 2rem;
+  }
+  
+  .max-w-7xl {
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
 
@@ -105,7 +137,7 @@ a, button {
 @media (max-width: 640px) {
   /* Stack grids on mobile */
   .grid-cols-2, .grid-cols-3, .grid-cols-4 {
-    @apply grid-cols-1;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
   }
 }
 

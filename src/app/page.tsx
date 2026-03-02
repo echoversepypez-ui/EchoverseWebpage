@@ -163,7 +163,7 @@ export default function Home() {
 
 
       {/* Welcome Section - Welcoming Introduction */}
-      <section className="py-8 bg-linear-to-b from-purple-50 via-pink-50 to-white relative overflow-hidden">
+      <section className="py-8 bg-gradient-to-b from-purple-50 via-pink-50 to-white relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute top-10 left-5 text-3xl opacity-10 animate-bounce">🌟</div>
         <div className="absolute bottom-20 right-10 text-4xl opacity-10 animate-bounce" style={{animationDelay: '0.5s'}}>✨</div>
@@ -176,7 +176,7 @@ export default function Home() {
             </div>
             
             <h2 className="text-2xl sm:text-3xl font-black text-gray-900 leading-tight">
-              Welcome to <span className="bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Echoverse Online Tutorial Services</span>
+              Welcome to <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Echoverse Online Tutorial Services</span>
             </h2>
             
             <p className="text-sm text-gray-700 leading-relaxed max-w-2xl mx-auto">
@@ -185,30 +185,30 @@ export default function Home() {
           </div>
 
           {/* What We Offer - 3 columns */}
-          <div className="grid md:grid-cols-3 gap-4 mb-8">
+          <div className="grid md:grid-cols-3 gap-4 sm:gap-6 mb-8">
             {/* Column 1 */}
-            <div className="text-center p-3 bg-white rounded-lg border border-purple-100 hover:border-purple-300 hover:shadow-md transition-all duration-300">
-              <div className="text-3xl mb-2">🎓</div>
-              <h3 className="text-sm font-bold text-gray-900 mb-1">Quality Education</h3>
-              <p className="text-xs text-gray-600 leading-tight">
+            <div className="text-center p-4 sm:p-6 bg-white rounded-lg border border-purple-100 hover:border-purple-300 hover:shadow-md transition-all duration-300">
+              <div className="text-3xl sm:text-4xl mb-2">🎓</div>
+              <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-1">Quality Education</h3>
+              <p className="text-xs sm:text-sm text-gray-600 leading-tight">
                 Deliver engaging lessons to motivated students worldwide. We provide all the tools and resources you need.
               </p>
             </div>
 
             {/* Column 2 */}
-            <div className="text-center p-3 bg-white rounded-lg border border-pink-100 hover:border-pink-300 hover:shadow-md transition-all duration-300">
-              <div className="text-3xl mb-2">💼</div>
-              <h3 className="text-sm font-bold text-gray-900 mb-1">Flexible Career</h3>
-              <p className="text-xs text-gray-600 leading-tight">
+            <div className="text-center p-4 sm:p-6 md:p-8 bg-white rounded-lg border border-pink-100 hover:border-pink-300 hover:shadow-md transition-all duration-300">
+              <div className="text-3xl sm:text-4xl mb-2">💼</div>
+              <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-1">Flexible Career</h3>
+              <p className="text-xs sm:text-sm text-gray-600 leading-tight">
                 Work on your schedule. No 9-to-5 commitment. Full control over your hours and workload.
               </p>
             </div>
 
             {/* Column 3 */}
-            <div className="text-center p-3 bg-white rounded-lg border border-purple-100 hover:border-purple-300 hover:shadow-md transition-all duration-300">
-              <div className="text-3xl mb-2">🚀</div>
-              <h3 className="text-sm font-bold text-gray-900 mb-1">Real Growth</h3>
-              <p className="text-xs text-gray-600 leading-tight">
+            <div className="text-center p-4 sm:p-6 md:p-8 bg-white rounded-lg border border-green-100 hover:border-green-300 hover:shadow-md transition-all duration-300">
+              <div className="text-3xl sm:text-4xl mb-2">🚀</div>
+              <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-1">Real Growth</h3>
+              <p className="text-xs sm:text-sm text-gray-600 leading-tight">
                 Build your reputation, grow your earnings, and advance your career with us.
               </p>
             </div>
@@ -216,7 +216,7 @@ export default function Home() {
         </div>
 
         {/* Quick Facts Strip */}
-        <div className="bg-linear-to-br from-purple-600 via-purple-500 to-pink-600 rounded-3xl p-12 sm:p-16 text-white shadow-2xl transform hover:shadow-3xl transition-all duration-300 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-pink-600 rounded-3xl p-12 sm:p-16 text-white shadow-2xl transform hover:shadow-3xl transition-all duration-300 relative overflow-hidden">
           {/* Decorative background */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-40 -mt-40"></div>
           <div className="absolute bottom-0 left-0 w-80 h-80 bg-white/5 rounded-full -ml-32 -mb-32"></div>
@@ -231,71 +231,37 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {(() => {
-                  const section = pageSections.find((s) => s.section_name === 'why_join');
-                  const benefits = (section?.content as { benefits?: Benefit[] } | undefined)?.benefits;
-                  return benefits && benefits.length > 0
-                    ? benefits.map((benefit: Benefit, index: number) => (
-                        <div 
-                          key={index} 
-                          className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60"
-                        >
-                          {/* Icon container */}
-                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                            <div className="text-5xl">{benefit.icon}</div>
-                          </div>
-                          
-                          <h4 className="text-xl font-bold mb-4 leading-tight group-hover:text-white transition-colors">{benefit.title}</h4>
-                          <p className="text-base leading-relaxed text-white/90 group-hover:text-white transition-colors">{benefit.description}</p>
-                          
-                          {/* Decorative hover effect */}
-                          <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-white/0 to-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                        </div>
-                      ))
-                    : (
-                      <>
-                        <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
-                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                            <div className="text-5xl">💰</div>
-                          </div>
-                          <h4 className="text-xl font-bold mb-4">Competitive Pay</h4>
-                          <p className="text-base leading-relaxed text-white/90">Earn $15-25+ per hour with rates based on your experience and qualifications</p>
-                        </div>
-                        
-                        <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
-                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                            <div className="text-5xl">⏰</div>
-                          </div>
-                          <h4 className="text-xl font-bold mb-4">Flexible Schedule</h4>
-                          <p className="text-base leading-relaxed text-white/90">Work on your terms. Choose your hours and the number of students you teach</p>
-                        </div>
-                        
-                        <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
-                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                            <div className="text-5xl">🌍</div>
-                          </div>
-                          <h4 className="text-xl font-bold mb-4">Global Students</h4>
-                          <p className="text-base leading-relaxed text-white/90">Teach learners from Japan, Korea, China, Thailand, Vietnam and beyond</p>
-                        </div>
-                        
-                        <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
-                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                            <div className="text-5xl">👥</div>
-                          </div>
-                          <h4 className="text-xl font-bold mb-4">24/7 Support</h4>
-                          <p className="text-base leading-relaxed text-white/90">Our dedicated team is always ready to help you succeed</p>
-                        </div>
-                        
-                        <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
-                          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
-                            <div className="text-5xl">📈</div>
-                          </div>
-                          <h4 className="text-xl font-bold mb-4">Career Growth</h4>
-                          <p className="text-base leading-relaxed text-white/90">Access multiple teaching opportunities and advance your career</p>
-                        </div>
-                      </>
-                    )
-                })()}
+                  <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                      <div className="text-5xl">💰</div>
+                    </div>
+                    <h4 className="text-xl font-bold mb-4">Competitive Pay</h4>
+                    <p className="text-base leading-relaxed text-white/90">Earn $15-25+ per hour with rates based on your experience and qualifications</p>
+                  </div>
+                  
+                  <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                      <div className="text-5xl">⏰</div>
+                    </div>
+                    <h4 className="text-xl font-bold mb-4">Flexible Schedule</h4>
+                    <p className="text-base leading-relaxed text-white/90">Work on your terms. Choose your hours and the number of students you teach</p>
+                  </div>
+                  
+                  <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                      <div className="text-5xl">🌍</div>
+                    </div>
+                    <h4 className="text-xl font-bold mb-4">Global Students</h4>
+                    <p className="text-base leading-relaxed text-white/90">Teach learners from Japan, Korea, China, Thailand, Vietnam and beyond</p>
+                  </div>
+
+                  <div className="group relative bg-white/10 backdrop-blur-md rounded-2xl p-8 text-center hover:bg-white/20 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-white/30 hover:border-white/60">
+                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 mb-6 group-hover:bg-white/30 group-hover:scale-110 transition-all duration-300">
+                      <div className="text-5xl">📈</div>
+                    </div>
+                    <h4 className="text-xl font-bold mb-4">Career Growth</h4>
+                    <p className="text-base leading-relaxed text-white/90">Access multiple teaching opportunities and advance your career</p>
+                  </div>
               </div>
             )}
           </div>
@@ -306,11 +272,11 @@ export default function Home() {
           <p className="text-lg text-gray-700 mb-6">
             Ready to join our community and transform your teaching career?
           </p>
-          <Link href="#accounts-available" className="group relative inline-flex px-10 py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
+          <Link href="#accounts-available" className="group relative inline-flex px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 overflow-hidden">
             <span className="relative z-10 flex items-center justify-center gap-2">
               Get Started Now <span className="group-hover:translate-x-1 transition">→</span>
             </span>
-            <div className="absolute inset-0 bg-linear-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
           </Link>
         </div>
       </section>
@@ -318,7 +284,7 @@ export default function Home() {
 
 
       {/* Statistics Section - Premium Dark */}
-      <section className="relative py-8 bg-linear-to-br from-slate-950 via-purple-900 to-slate-950 text-white overflow-hidden">
+      <section className="relative py-8 bg-gradient-to-br from-slate-950 via-purple-900 to-slate-950 text-white overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl"></div>
@@ -329,7 +295,7 @@ export default function Home() {
           <div className="text-center mb-6 space-y-2">
             <h2 className="text-2xl sm:text-3xl font-black">Trusted by Educators</h2>
             <p className="text-sm text-gray-300 max-w-2xl mx-auto">Join our thriving global community of successful language teachers</p>
-            <div className="w-16 h-0.5 bg-linear-to-r from-purple-400 to-pink-400 mx-auto rounded-full"></div>
+            <div className="w-16 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mx-auto rounded-full"></div>
           </div>
           
           {statsLoading ? (
@@ -340,10 +306,10 @@ export default function Home() {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
               {pageStats.map((stat) => (
                 <div key={stat.stat_key} className="p-3 bg-white/10 backdrop-blur border border-white/20 rounded-lg hover:border-purple-400 hover:bg-white/15 transition-all duration-300 group">
-                  <div className="text-3xl font-black bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform">{stat.stat_value}</div>
+                  <div className="text-3xl font-black bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-1 group-hover:scale-110 transition-transform">{stat.stat_value}</div>
                   <h3 className="text-sm font-bold mb-0.5">{stat.stat_label}</h3>
                   <p className="text-xs text-gray-300">{stat.stat_description}</p>
-                  <div className="mt-2 h-0.5 w-6 bg-linear-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all rounded-full"></div>
+                  <div className="mt-2 h-0.5 w-6 bg-gradient-to-r from-purple-400 to-pink-400 group-hover:w-full transition-all rounded-full"></div>
                 </div>
               ))}
             </div>
@@ -352,7 +318,7 @@ export default function Home() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 bg-linear-to-br from-slate-50 via-white to-purple-50">
+      <section className="py-16 bg-gradient-to-br from-slate-50 via-white to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12 space-y-4">
             <h2 className="text-3xl sm:text-4xl font-black text-gray-900">What Teachers Say</h2>
@@ -383,10 +349,10 @@ export default function Home() {
       </section>
 
       {/* Detailed Journey Timeline */}
-      <section className="py-8 bg-linear-to-b from-purple-50 via-white to-pink-50">
+      <section className="py-8 bg-gradient-to-b from-purple-50 via-white to-pink-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">Your Journey to Success</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">Your Journey to Success</h2>
             <p className="text-sm text-gray-600 max-w-3xl mx-auto leading-relaxed">Follow our streamlined 4-step process from application to your first class. Each step is designed to set you up for success with comprehensive support every step of the way.</p>
           </div>
 
@@ -398,7 +364,7 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-2 mb-6 relative">
               {/* Connecting Lines */}
-              <div className="hidden lg:block absolute top-28 left-0 right-0 h-1 bg-linear-to-r from-purple-600 via-pink-600 to-green-600 -z-10"></div>
+              <div className="hidden lg:block absolute top-28 left-0 right-0 h-1 bg-gradient-to-r from-purple-600 via-pink-600 to-green-600 -z-10"></div>
 
               {journeySteps.data.map((step) => {
                 const colorThemes: { [key: string]: string } = {
@@ -418,7 +384,7 @@ export default function Home() {
                 return (
                   <div key={step.id} className="relative group">
                     <div className={`bg-white rounded-xl md:rounded-2xl p-5 md:p-6 lg:p-5 shadow-md hover:shadow-xl transition duration-300 border-2 border-${borderColor} hover:border-${hoverColor} h-full flex flex-col`}>
-                      <div className={`absolute -top-5 left-1/2 transform -translate-x-1/2 w-10 md:w-12 h-10 md:h-12 bg-linear-to-r from-${fromColor} to-${toColor} text-white rounded-full flex items-center justify-center font-bold text-lg md:text-lg group-hover:scale-110 transition`}>
+                      <div className={`absolute -top-5 left-1/2 transform -translate-x-1/2 w-10 md:w-12 h-10 md:h-12 bg-gradient-to-r from-${fromColor} to-${toColor} text-white rounded-full flex items-center justify-center font-bold text-lg md:text-lg group-hover:scale-110 transition`}>
                         {step.emoji}
                       </div>
                       
@@ -477,17 +443,17 @@ export default function Home() {
 
           {/* Additional Info Cards */}
           <div className="grid md:grid-cols-3 gap-6 mt-20">
-            <div className="bg-linear-to-br from-purple-50 to-purple-100 rounded-xl p-6 shadow-md hover:shadow-lg transition border-l-4 border-purple-600 hover:border-purple-700">
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 shadow-md hover:shadow-lg transition border-l-4 border-purple-600 hover:border-purple-700">
               <h4 className="text-lg font-bold text-purple-900 mb-3">❓ What If I Don&apos;t Get Selected?</h4>
               <p className="text-purple-800 text-sm leading-relaxed">Don&apos;t worry! You&apos;ll receive constructive feedback on areas to improve. You can reapply after 30 days with updated qualifications or certifications. We want to see you succeed! 💪</p>
             </div>
 
-            <div className="bg-linear-to-br from-pink-50 to-pink-100 rounded-xl p-6 shadow-md hover:shadow-lg transition border-l-4 border-pink-600 hover:border-pink-700">
+            <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-6 shadow-md hover:shadow-lg transition border-l-4 border-pink-600 hover:border-pink-700">
               <h4 className="text-lg font-bold text-pink-900 mb-3">❓ How Much Will I Earn?</h4>
               <p className="text-pink-800 text-sm leading-relaxed"><span className="font-bold">$15-25+/hour</span> depending on your qualifications and experience level. Earn premium rates ($25-35/hour) for specialized skills like TOEFL, Business English, or specific niches. 📈</p>
             </div>
 
-            <div className="bg-linear-to-br from-green-50 to-green-100 rounded-xl p-6 shadow-md hover:shadow-lg transition border-l-4 border-green-600 hover:border-green-700">
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 shadow-md hover:shadow-lg transition border-l-4 border-green-600 hover:border-green-700">
               <h4 className="text-lg font-bold text-green-900 mb-3">❓ When Do I Get Paid?</h4>
               <p className="text-green-800 text-sm leading-relaxed">Monthly payments on the <span className="font-bold">1st of each month</span> for all lessons taught. Choose between direct bank transfer or PayPal. Fast, reliable, and transparent. 💰</p>
             </div>
@@ -495,7 +461,7 @@ export default function Home() {
 
           {/* CTA Button */}
           <div className="text-center mt-20">
-            <button onClick={() => setShowApplicationModal(true)} className="px-12 py-5 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold text-lg hover:opacity-90 transition transform hover:scale-105 shadow-xl hover:shadow-2xl">
+            <button onClick={() => setShowApplicationModal(true)} className="px-12 py-5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold text-lg hover:opacity-90 transition transform hover:scale-105 shadow-xl hover:shadow-2xl">
               🚀 Start Your Journey Today
             </button>
             <p className="text-gray-600 text-sm mt-6 font-medium">From application to first class in as little as <span className="font-bold text-purple-600">3-5 days</span> • 98% acceptance rate • Zero experience needed</p>
@@ -519,7 +485,7 @@ export default function Home() {
       <FAQSection />
 
       {/* Final CTA Section - Premium */}
-      <section className="relative py-8 bg-linear-to-br from-slate-950 via-purple-900 to-slate-950 text-white overflow-hidden">
+      <section className="relative py-8 bg-gradient-to-br from-slate-950 via-purple-900 to-slate-950 text-white overflow-hidden">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 opacity-20">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
@@ -529,18 +495,18 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <div className="space-y-3">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight">
-              Ready to Transform <span className="bg-linear-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Your Teaching Career?</span>
+              Ready to Transform <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">Your Teaching Career?</span>
             </h2>
             <p className="text-sm text-gray-300 max-w-2xl mx-auto leading-relaxed">
               Join 500+ educators earning premium income with Echoverse. <span className="font-bold">Quick approval</span> • <span className="font-bold">100% flexible</span> • <span className="font-bold">24/7 support</span>
             </p>
             
             <div className="flex flex-col sm:flex-row gap-2 justify-center pt-4">
-              <button onClick={() => setShowApplicationModal(true)} className="group relative px-6 py-2 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold text-sm hover:shadow-lg transition-all duration-300 transform hover:scale-105 overflow-hidden">
+              <button onClick={() => setShowApplicationModal(true)} className="group relative px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold text-sm hover:shadow-lg transition-all duration-300 transform hover:scale-105 overflow-hidden">
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   Start Your Journey Now <span className="group-hover:translate-x-1 transition">🚀</span>
                 </span>
-                <div className="absolute inset-0 bg-linear-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
               </button>
               <Link href="/teachers-profile" className="px-6 py-2 border-2 border-purple-400 text-white rounded-lg font-bold text-sm hover:bg-white/10 hover:shadow-lg transition-all duration-300 transform hover:scale-105">
                 Explore Opportunities
@@ -559,7 +525,7 @@ export default function Home() {
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-gray-100">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-linear-to-r from-purple-600 to-pink-600 text-white p-8 flex justify-between items-center rounded-t-xl">
+            <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-8 flex justify-between items-center rounded-t-xl">
               <div>
                 <h2 className="text-3xl font-black">Join Echoverse</h2>
                 <p className="text-purple-100 text-sm mt-1">Start earning in 3-5 days</p>
@@ -672,7 +638,7 @@ export default function Home() {
                 </select>
               </div>
 
-              <div className="space-y-4 p-6 bg-linear-to-br from-blue-50 via-blue-50 to-indigo-50 border-2 border-blue-300 rounded-2xl shadow-md">
+              <div className="space-y-4 p-6 bg-gradient-to-br from-blue-50 via-blue-50 to-indigo-50 border-2 border-blue-300 rounded-2xl shadow-md">
                 {/* Header */}
                 <div className="flex items-start gap-4">
                   <div className="shrink-0">
@@ -735,7 +701,7 @@ export default function Home() {
                     </div>
 
                     {/* Trust & Security Section */}
-                    <div className="bg-linear-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200 mb-3">
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200 mb-3">
                       <div className="flex items-start gap-2">
                         <span className="text-lg shrink-0">🛡️</span>
                         <div>
@@ -788,9 +754,9 @@ export default function Home() {
               )}
 
               <div className="flex gap-4 pt-8 border-t-2 border-gray-200">
-                <button type="submit" disabled={applicationLoading || !applicationData.agreed_to_terms} className="flex-1 relative bg-linear-to-r from-purple-600 to-pink-600 text-white px-6 py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden">
+                <button type="submit" disabled={applicationLoading || !applicationData.agreed_to_terms} className="flex-1 relative bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden">
                   <span className="relative z-10">{applicationLoading ? '⏳ Submitting...' : '🚀 Submit Application'}</span>
-                  <div className="absolute inset-0 bg-linear-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 </button>
                 <button type="button" onClick={() => setShowApplicationModal(false)} className="flex-1 bg-gray-100 text-gray-900 px-6 py-4 rounded-xl font-bold text-lg hover:bg-gray-200 hover:shadow-md transition-all duration-300 border-2 border-gray-200">
                   Cancel
@@ -806,3 +772,5 @@ export default function Home() {
     </div>
   );
 }
+
+

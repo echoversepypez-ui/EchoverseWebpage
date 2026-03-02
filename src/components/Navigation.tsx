@@ -40,8 +40,8 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 bg-linear-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-lg shadow-lg">🎓</div>
-            <span className="text-2xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent group-hover:opacity-80 transition">Echoverse</span>
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-lg shadow-lg">🎓</div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent group-hover:opacity-80 transition">Echoverse</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -52,7 +52,7 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
                 href={link.href}
                 className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
                   link.active
-                    ? 'text-white bg-linear-to-r from-purple-600 to-pink-600 font-semibold shadow-lg'
+                    ? 'text-white bg-gradient-to-r from-purple-600 to-pink-600 font-semibold shadow-lg'
                     : 'text-gray-700 hover:text-purple-600 hover:bg-gray-100'
                 }`}
                 aria-current={link.active ? 'page' : undefined}
@@ -76,7 +76,7 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="px-4 py-2 rounded-lg font-semibold text-white bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-lg transition-all duration-300"
+                    className="px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-lg transition-all duration-300"
                   >
                     Logout
                   </button>
@@ -91,7 +91,7 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
                   </Link>
                   <Link
                     href="/applicant/login"
-                    className="px-4 py-2 rounded-lg font-semibold text-white bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-lg transition-all duration-300 rounded-lg"
+                    className="px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-lg transition-all duration-300 rounded-lg"
                   >
                     Sign up
                   </Link>
@@ -103,7 +103,7 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition"
+            className="md:hidden p-3 hover:bg-gray-100 rounded-lg transition touch-manipulation"
             aria-label="Toggle menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -124,14 +124,14 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 space-y-2 bg-gray-50">
+          <div className="md:hidden py-4 border-t border-gray-200 space-y-2 bg-gray-50 max-h-[80vh] overflow-y-auto">
             {mainLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`block px-4 py-2 rounded-lg transition-all duration-300 ${
+                className={`block px-4 py-3 rounded-lg transition-all duration-300 text-base ${
                   link.active
-                    ? 'text-white bg-linear-to-r from-purple-600 to-pink-600 font-semibold'
+                    ? 'text-white bg-gradient-to-r from-purple-600 to-pink-600 font-semibold'
                     : 'text-gray-700 hover:text-purple-600 hover:bg-gray-100'
                 }`}
                 onClick={() => setMobileMenuOpen(false)}
@@ -139,13 +139,13 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
                 {link.label}
               </Link>
             ))}
-            <div className="pt-3 mt-3 border-t border-gray-200 flex flex-col gap-2 px-4">
+            <div className="pt-4 mt-4 border-t border-gray-200 flex flex-col gap-3 px-4">
               {!applicantLoading && isApplicantLoggedIn ? (
                 <>
-                  <p className="text-sm text-gray-600 truncate px-1">Hi, {displayName || 'Applicant'}</p>
+                  <p className="text-sm text-gray-600 truncate px-1 py-2">Hi, {displayName || 'Applicant'}</p>
                   <Link
                     href="/applicant/dashboard"
-                    className="py-2.5 text-center rounded-lg font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition"
+                    className="py-3 text-center rounded-lg font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition text-base"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     My applications
@@ -153,7 +153,7 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="py-2.5 rounded-lg font-semibold text-white bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition"
+                    className="py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition text-base"
                   >
                     Logout
                   </button>
@@ -162,14 +162,14 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
                 <>
                   <Link
                     href="/applicant/login"
-                    className="flex-1 py-2.5 text-center rounded-lg font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition"
+                    className="w-full py-3 text-center rounded-lg font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition text-base"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     href="/applicant/login"
-                    className="flex-1 py-2.5 text-center rounded-lg font-semibold text-white bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition"
+                    className="w-full py-3 text-center rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition text-base"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Sign up

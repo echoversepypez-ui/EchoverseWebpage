@@ -62,7 +62,7 @@ export const TableOfContents = () => {
                 }}
                 className={`px-2 sm:px-6 py-2 sm:py-3 rounded-full text-xs sm:text-base font-bold whitespace-nowrap shrink-0 transition-all duration-300 ease-out cursor-pointer ${
                   activeSection === section.id
-                    ? 'bg-linear-to-r from-purple-600 to-pink-600 text-white shadow-2xl sm:scale-110 ring-2 ring-pink-300'
+                    ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl sm:scale-110 ring-2 ring-pink-300'
                     : 'bg-gray-100 text-gray-800 border-2 border-transparent hover:border-purple-400 hover:bg-white hover:shadow-lg sm:hover:scale-105'
                 }`}
               >

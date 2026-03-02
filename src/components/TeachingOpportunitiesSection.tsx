@@ -87,7 +87,7 @@ export const TeachingOpportunitiesSection = () => {
   const uniqueShifts = ['all', ...Array.from(new Set(accounts.map(a => a.shift)))];
 
   return (
-    <section className="py-16 sm:py-20 lg:py-24 bg-linear-to-b from-white to-gray-50" id="opportunities">
+    <section className="py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-white to-gray-50" id="opportunities">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header - Mobile optimized */}
         <div className="text-center mb-8 sm:mb-12">
@@ -198,7 +198,7 @@ export const TeachingOpportunitiesSection = () => {
                   className="bg-white rounded-lg border-2 border-gray-200 hover:border-black hover:shadow-xl transition-all overflow-hidden group flex flex-col"
                 >
                   {/* Header */}
-                  <div className="bg-linear-to-r from-blue-50 to-purple-50 p-3 sm:p-4 border-b border-gray-200">
+                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-3 sm:p-4 border-b border-gray-200">
                     <div className="flex items-start justify-between gap-2 mb-3">
                       <div className="flex items-center gap-2 sm:gap-3 shrink min-w-0">
                         <span className="text-3xl sm:text-4xl shrink-0">{account.icon || '🌍'}</span>
@@ -327,7 +327,7 @@ export const TeachingOpportunitiesSection = () => {
           <div className="text-center pt-6 sm:pt-8 border-t border-gray-200">
             <Link
               href="/teachers-profile"
-              className="inline-flex px-6 sm:px-8 py-3 sm:py-4 bg-linear-to-r from-black to-gray-800 text-white rounded-lg font-bold hover:shadow-xl transition transform hover:scale-105 text-sm sm:text-base min-h-11 items-center justify-center"
+              className="inline-flex px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-black to-gray-800 text-white rounded-lg font-bold hover:shadow-xl transition transform hover:scale-105 text-sm sm:text-base min-h-11 items-center justify-center"
             >
               Explore All Positions
             </Link>

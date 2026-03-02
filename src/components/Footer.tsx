@@ -6,7 +6,7 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-linear-to-b from-slate-950 to-slate-900 text-white border-t border-purple-600/20">
+    <footer className="bg-gradient-to-b from-slate-950 to-slate-900 text-white border-t border-purple-600/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="py-8 sm:py-10 lg:py-12">
           {/* Top Row - Brand & Grid */}
@@ -17,7 +17,7 @@ export const Footer = () => {
                 href="/"
                 className="inline-flex items-center gap-2 group mb-3 hover:opacity-90 transition"
               >
-                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-linear-to-br from-purple-400 to-pink-400 rounded-xl flex items-center justify-center text-base shadow-md shadow-purple-500/40">
+                <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-purple-400 to-pink-400 rounded-xl flex items-center justify-center text-base shadow-md shadow-purple-500/40">
                   🎓
                 </div>
                 <div className="flex flex-col">
@@ -161,7 +161,7 @@ export const Footer = () => {
                 />
                 <button
                   type="submit"
-                  className="px-3 sm:px-4 py-2 bg-linear-to-r from-purple-600 to-pink-600 hover:brightness-110 rounded-md font-semibold text-xs sm:text-sm transition shadow-md shadow-purple-500/40"
+                  className="px-3 sm:px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:brightness-110 rounded-md font-semibold text-xs sm:text-sm transition shadow-md shadow-purple-500/40"
                 >
                   Join
                 </button>

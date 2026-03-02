@@ -56,7 +56,7 @@ export function AdminHeader({
             )}
             <Link 
               href="/" 
-              className="text-2xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent hover:opacity-80 transition"
+              className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent hover:opacity-80 transition"
             >
               🎓 Echoverse
             </Link>
@@ -66,7 +66,7 @@ export function AdminHeader({
           <div className="flex items-center gap-4">
             <button
               onClick={handleLogout}
-              className="px-4 py-2 bg-linear-to-r from-red-600 to-pink-600 text-white rounded-lg font-semibold hover:from-red-700 hover:to-pink-700 transition shadow-md hover:shadow-lg"
+              className="px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-lg font-semibold hover:from-red-700 hover:to-pink-700 transition shadow-md hover:shadow-lg"
             >
               Logout
             </button>
@@ -75,7 +75,7 @@ export function AdminHeader({
 
         {/* Title Section */}
         <div className="border-t border-gray-200 pt-4">
-          <h1 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
             {title}
           </h1>
           {subtitle && (
