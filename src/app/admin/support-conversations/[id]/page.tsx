@@ -13,9 +13,17 @@ export default function ConversationDetailPage({ params }: { params: Promise<{ i
   const conversationId = resolvedParams.id;
   
   const { getConversation, updateConversationStatus } = useAdminConversations();
-  const { messages, loading: messagesLoading, error: messagesError, sendMessage, markMessagesAsRead } = useConversationMessages(conversationId);
+  const { messages, sendMessage, markMessagesAsRead } = useConversationMessages(conversationId);
   
-  const [conversation, setConversation] = useState<any>(null);
+  const [conversation, setConversation] = useState<{
+    id: string;
+    guest_name?: string;
+    guest_id?: string;
+    guest_email?: string;
+    status: string;
+    created_at: string;
+    last_message_at?: string;
+  } | null>(null);
   const [adminMessage, setAdminMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -29,7 +37,7 @@ export default function ConversationDetailPage({ params }: { params: Promise<{ i
       sessionStorage.setItem('admin_session_id', id);
       return id;
     }
-    return `admin_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    return 'admin_session_placeholder';
   });
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -97,10 +105,10 @@ export default function ConversationDetailPage({ params }: { params: Promise<{ i
       if (conversation?.status === 'open') {
         console.log('[Detail] Updating conversation status to in-progress');
         await updateConversationStatus(conversationId, 'in-progress');
-        setConversation((prev: any) => ({
+        setConversation((prev) => ({
           ...prev,
           status: 'in-progress',
-        }));
+        } as typeof prev));
       }
 
       // Send message
@@ -196,7 +204,7 @@ export default function ConversationDetailPage({ params }: { params: Promise<{ i
                     {message.sender_type === 'guest' ? 'Guest' : 'Support Agent'}
                   </span>
                   <span className={styles.timestamp}>
-                    {new Date(message.created_at).toLocaleTimeString()}
+                    {typeof window !== 'undefined' ? new Date(message.created_at).toLocaleTimeString() : ''}
                   </span>
                 </div>
                 <div className={styles.messageContent}>{message.message}</div>
@@ -235,9 +243,9 @@ export default function ConversationDetailPage({ params }: { params: Promise<{ i
 
       <div className={styles.conversationMeta}>
         <p>Message Count: {messages.length}</p>
-        <p>Created: {new Date(conversation.created_at).toLocaleString()}</p>
+        <p>Created: {typeof window !== 'undefined' ? new Date(conversation.created_at).toLocaleString() : ''}</p>
         {conversation.last_message_at && (
-          <p>Last Message: {new Date(conversation.last_message_at).toLocaleString()}</p>
+          <p>Last Message: {typeof window !== 'undefined' ? new Date(conversation.last_message_at).toLocaleString() : ''}</p>
         )}
       </div>
     </div>

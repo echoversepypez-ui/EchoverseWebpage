@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { useApplicantAuth } from '@/lib/applicant-auth-context';
+import { useMobileDetection } from '@/hooks/useMobileDetection';
+import { MobileNavigation } from './MobileNavigation';
 
 interface NavLink {
   label: string;
@@ -17,13 +18,12 @@ interface NavigationProps {
 
 export const Navigation = ({ activeLink = '' }: NavigationProps) => {
   const router = useRouter();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, displayName, isLoading: applicantLoading, signOut } = useApplicantAuth();
+  const { isMobile, isTablet } = useMobileDetection();
   const isApplicantLoggedIn = !!user;
 
   const handleLogout = () => {
     signOut();
-    setMobileMenuOpen(false);
     router.push('/');
   };
 
@@ -34,49 +34,67 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
     { label: 'Contact', href: '/contact', active: activeLink === 'contact' },
   ];
 
+  // Show mobile navigation for mobile and tablet devices
+  if (isMobile || isTablet) {
+    return <MobileNavigation activeLink={activeLink} />;
+  }
+
+  // Desktop navigation
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-md">
+    <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-18">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-xl flex items-center justify-center text-lg shadow-lg">🎓</div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent group-hover:opacity-80 transition">Echoverse</span>
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="w-12 h-12 bg-linear-to-br from-purple-600 via-purple-500 to-pink-600 rounded-2xl flex items-center justify-center text-xl shadow-lg group-hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+              🎓
+            </div>
+            <div className="flex flex-col">
+              <span className="text-2xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent group-hover:opacity-90 transition">Echoverse</span>
+              <span className="text-xs text-gray-500 font-medium">Online Tutorial Services</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-1 items-center">
+          <div className="hidden md:flex items-center space-x-1">
             {mainLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                className={`px-5 py-2.5 rounded-xl font-medium transition-all duration-300 text-sm ${
                   link.active
-                    ? 'text-white bg-gradient-to-r from-purple-600 to-pink-600 font-semibold shadow-lg'
-                    : 'text-gray-700 hover:text-purple-600 hover:bg-gray-100'
+                    ? 'text-white bg-linear-to-r from-purple-600 to-pink-600 font-semibold shadow-lg shadow-purple-500/25'
+                    : 'text-gray-700 hover:text-purple-600 hover:bg-purple-50 hover:shadow-sm'
                 }`}
                 aria-current={link.active ? 'page' : undefined}
               >
                 {link.label}
               </Link>
             ))}
-            {/* Applicant: profile + dashboard + logout, or Login / Sign up */}
-            <div className="ml-4 pl-4 border-l border-gray-200 flex items-center gap-2">
+            <div className="ml-6 pl-6 border-l border-gray-200 flex items-center gap-3">
               {!applicantLoading && isApplicantLoggedIn ? (
                 <>
-                  <span className="text-sm text-gray-600 truncate max-w-[120px]" title={user.email ?? ''}>
-                    Hi, {displayName || 'Applicant'}
-                  </span>
+                  <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
+                    <div className="w-8 h-8 bg-linear-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                      {(displayName || 'Applicant').charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm font-semibold text-gray-800 truncate max-w-[120px]" title={user.email ?? ''}>
+                        {displayName || 'Applicant'}
+                      </span>
+                      <span className="text-xs text-gray-500 truncate max-w-[120px]">{user.email}</span>
+                    </div>
+                  </div>
                   <Link
-                    href="/applicant/dashboard"
-                    className="px-4 py-2 rounded-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-gray-100 transition-all duration-300"
+                    href="/applicant/profile"
+                    className="px-4 py-2.5 rounded-xl font-medium text-gray-700 hover:text-purple-600 hover:bg-purple-50 transition-all duration-300 text-sm"
                   >
-                    My applications
+                    Profile
                   </Link>
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-lg transition-all duration-300"
+                    className="px-5 py-2.5 rounded-xl font-semibold text-white bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-lg transition-all duration-300 text-sm"
                   >
                     Logout
                   </button>
@@ -85,100 +103,21 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
                 <>
                   <Link
                     href="/applicant/login"
-                    className="px-4 py-2 rounded-lg font-medium text-gray-700 hover:text-purple-600 hover:bg-gray-100 transition-all duration-300"
+                    className="px-5 py-2.5 rounded-xl font-medium text-gray-700 hover:text-purple-600 hover:bg-purple-50 transition-all duration-300 text-sm"
                   >
                     Login
                   </Link>
                   <Link
                     href="/applicant/login"
-                    className="px-4 py-2 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-lg transition-all duration-300 rounded-lg"
+                    className="px-5 py-2.5 rounded-xl font-semibold text-white bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md hover:shadow-lg transition-all duration-300 text-sm"
                   >
-                    Sign up
+                    Get Started
                   </Link>
                 </>
               )}
             </div>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-3 hover:bg-gray-100 rounded-lg transition touch-manipulation"
-            aria-label="Toggle menu"
-            aria-expanded={mobileMenuOpen}
-          >
-            <svg
-              className={`w-6 h-6 transition-transform ${mobileMenuOpen ? 'rotate-90' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
         </div>
-
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 space-y-2 bg-gray-50 max-h-[80vh] overflow-y-auto">
-            {mainLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`block px-4 py-3 rounded-lg transition-all duration-300 text-base ${
-                  link.active
-                    ? 'text-white bg-gradient-to-r from-purple-600 to-pink-600 font-semibold'
-                    : 'text-gray-700 hover:text-purple-600 hover:bg-gray-100'
-                }`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-            <div className="pt-4 mt-4 border-t border-gray-200 flex flex-col gap-3 px-4">
-              {!applicantLoading && isApplicantLoggedIn ? (
-                <>
-                  <p className="text-sm text-gray-600 truncate px-1 py-2">Hi, {displayName || 'Applicant'}</p>
-                  <Link
-                    href="/applicant/dashboard"
-                    className="py-3 text-center rounded-lg font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition text-base"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    My applications
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={handleLogout}
-                    className="py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition text-base"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/applicant/login"
-                    className="w-full py-3 text-center rounded-lg font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 transition text-base"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/applicant/login"
-                    className="w-full py-3 text-center rounded-lg font-semibold text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition text-base"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Sign up
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   );

@@ -112,7 +112,7 @@ export function TestimonialCarousel({
                 className="group relative bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden h-full flex flex-col hover:-translate-y-2"
               >
                 {/* Gradient accent bar */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500"></div>
+                <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-purple-500 via-pink-500 to-purple-500"></div>
 
                 <div className="p-6 flex flex-col h-full">
                   {/* Rating Stars */}
@@ -133,7 +133,7 @@ export function TestimonialCarousel({
                   <div className="border-t border-gray-100 pt-4 mt-auto">
                     {/* Author Info */}
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-linear-to-br from-purple-500 via-pink-500 to-purple-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
                         {testimonial.name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
@@ -182,7 +182,7 @@ export function TestimonialCarousel({
               onClick={() => handleDotClick(i)}
               className={`rounded-full transition-all duration-300 ${
                 i === currentPage
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 w-8 h-3'
+                  ? 'bg-linear-to-r from-purple-600 to-pink-600 w-8 h-3'
                   : 'bg-gray-300 w-3 h-3 hover:bg-gray-400'
               }`}
               aria-label={`Go to testimonial page ${i + 1}`}
@@ -196,7 +196,7 @@ export function TestimonialCarousel({
         <div className="flex justify-center">
           <button
             onClick={handleLoadMore}
-            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
+            className="px-8 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300 hover:scale-105"
           >
             Load More Testimonials
           </button>

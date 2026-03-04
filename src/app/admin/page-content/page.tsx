@@ -7,8 +7,9 @@ import { usePageSections } from '@/hooks/usePageSections';
 import { usePageStats } from '@/hooks/usePageStats';
 import { useTestimonials } from '@/hooks/useTestimonials';
 import { ProtectedRoute } from '@/components/protected-route';
+import { WhatWeOfferEditor } from '@/components/WhatWeOfferEditor';
 
-type TabType = 'how_it_works' | 'requirements' | 'faq' | 'why_join' | 'testimonials' | 'contacts' | 'contact_info' | 'page_stats';
+type TabType = 'how_it_works' | 'requirements' | 'faq' | 'why_join' | 'what_we_offer' | 'testimonials' | 'contacts' | 'contact_info' | 'page_stats';
 
 export default function PageContentPage() {
   const { sections, loading, error, updateSection } = usePageSections();
@@ -65,7 +66,7 @@ export default function PageContentPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Tabs */}
           <div className="flex flex-wrap gap-2 mb-8 border-b-2 border-gray-300">
-            {(['how_it_works', 'requirements', 'faq', 'why_join', 'testimonials', 'contacts', 'contact_info', 'page_stats'] as TabType[]).map((tab) => (
+            {(['how_it_works', 'requirements', 'faq', 'why_join', 'what_we_offer', 'testimonials', 'contacts', 'contact_info', 'page_stats'] as TabType[]).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -79,6 +80,7 @@ export default function PageContentPage() {
                 {tab === 'requirements' && '✅ Requirements'}
                 {tab === 'faq' && '❓ FAQ'}
                 {tab === 'why_join' && '🎯 Why Join'}
+                {tab === 'what_we_offer' && '🎓 What We Offer'}
                 {tab === 'testimonials' && '💬 Testimonials'}
                 {tab === 'contacts' && '📋 Contact Reasons'}
                 {tab === 'contact_info' && '📞 Contact Info'}
@@ -135,6 +137,11 @@ export default function PageContentPage() {
               {/* Why Join Section */}
               {activeTab === 'why_join' && (
                 <WhyJoinEditor section={section} onUpdate={updateSection} setSaving={setSaving} setMessage={setMessage} />
+              )}
+
+              {/* What We Offer Section */}
+              {activeTab === 'what_we_offer' && (
+                <WhatWeOfferEditor section={section} onUpdate={updateSection} setSaving={setSaving} setMessage={setMessage} />
               )}
 
               {/* Testimonials Section */}
@@ -1223,7 +1230,7 @@ function ContactsEditor({
       <button
         onClick={handleSave}
         disabled={isLoading}
-        className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:shadow-lg transition disabled:opacity-50"
+        className="w-full px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:shadow-lg transition disabled:opacity-50"
       >
         {isLoading ? 'Saving...' : 'Save Changes'}
       </button>
@@ -1338,7 +1345,7 @@ function ContactInfoEditor({
       <button
         onClick={handleSave}
         disabled={isLoading}
-        className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:shadow-lg transition disabled:opacity-50"
+        className="w-full px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:shadow-lg transition disabled:opacity-50"
       >
         {isLoading ? 'Saving...' : 'Save Changes'}
       </button>

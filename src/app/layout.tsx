@@ -4,6 +4,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import { ApplicantAuthProvider } from "@/lib/applicant-auth-context";
 import { Navigation } from "@/components/Navigation";
 import { SupportChatbot } from "@/components/SupportChatbot";
+import { MobileLayout } from "@/components/MobileLayout";
 
 export const metadata: Metadata = {
   title: "Echoverse - Online Tutorial Services",
@@ -31,16 +32,19 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="theme-color" content="#ffffff" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
       </head>
       <body className="antialiased">
         <AuthProvider>
           <ApplicantAuthProvider>
-            <Navigation />
-            {children}
-            <SupportChatbot />
+            <MobileLayout>
+              <Navigation />
+              {children}
+              <SupportChatbot />
+            </MobileLayout>
           </ApplicantAuthProvider>
         </AuthProvider>
-        {/* external chat embed removed; using internal support chatbot instead */}      </body>
+      </body>
     </html>
   );
 }

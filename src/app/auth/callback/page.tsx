@@ -11,7 +11,7 @@ function AuthCallbackContent() {
 
   useEffect(() => {
     const code = searchParams.get('code');
-    const next = searchParams.get('next') ?? '/applicant/dashboard';
+    const next = searchParams.get('next') ?? '/applicant/profile';
 
     if (!code) {
       router.replace('/applicant/login?error=missing_code');
@@ -31,7 +31,7 @@ function AuthCallbackContent() {
   }, [searchParams, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-purple-50 via-pink-50 to-purple-50">
       <div className="text-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4" />
         <p className="text-gray-600">{message}</p>

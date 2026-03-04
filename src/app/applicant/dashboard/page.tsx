@@ -18,6 +18,12 @@ interface Application {
   email: string;
   phone: string;
   status: 'new' | 'reviewed' | 'contacted' | 'approved' | 'rejected';
+  demo_recording_status: 'not_submitted' | 'pending_review' | 'approved' | 'rejected' | 'needs_revision';
+  demo_recording_review_result?: string;
+  demo_recording_submitted_date?: string;
+  demo_recording_review_notes?: string;
+  demo_recording_reviewed_date?: string;
+  demo_recording_url?: string;
   created_at: string;
 }
 
@@ -36,6 +42,7 @@ const STATUS_COLORS: Record<string, string> = {
   approved: 'bg-green-100 text-green-800',
   rejected: 'bg-red-100 text-red-800',
 };
+
 
 export default function ApplicantDashboardPage() {
   const router = useRouter();
@@ -58,7 +65,7 @@ export default function ApplicantDashboardPage() {
     try {
       const { data, error } = await supabase
         .from('applications')
-        .select('id, name, email, phone, status, created_at')
+        .select('id, name, email, phone, status, created_at, demo_recording_status, demo_recording_review_result, demo_recording_submitted_date, demo_recording_review_notes, demo_recording_reviewed_date, demo_recording_url')
         .eq('email', email)
         .order('created_at', { ascending: false });
       if (error) throw error;
@@ -75,6 +82,7 @@ export default function ApplicantDashboardPage() {
     router.replace('/applicant/login');
     router.refresh();
   };
+
 
   if (loading && !user) {
     return (
@@ -165,6 +173,7 @@ export default function ApplicantDashboardPage() {
             </ul>
           )}
 
+          
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/"
@@ -181,6 +190,7 @@ export default function ApplicantDashboardPage() {
           </div>
         </div>
       </div>
+
     </div>
   );
 }

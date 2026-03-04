@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 
 export interface PageSection {
@@ -15,6 +15,7 @@ export const usePageSections = (sectionName?: string) => {
   const [sections, setSections] = useState<PageSection[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const subscriptionRef = useRef<any>(null);
 
   const fetchSections = async () => {
     try {
@@ -46,8 +47,77 @@ export const usePageSections = (sectionName?: string) => {
     }
   };
 
+  // Set up real-time subscription
+  const setupRealtimeSubscription = () => {
+    if (subscriptionRef.current) {
+      subscriptionRef.current.unsubscribe();
+    }
+
+    const subscription = supabase
+      .channel('page_sections_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'page_sections',
+          ...(sectionName && { filter: `section_name=eq.${sectionName}` })
+        },
+        (payload) => {
+          console.log('Real-time update received:', payload);
+          
+          // Dispatch custom event for UI indicators
+          const eventName = payload.eventType === 'UPDATE' ? 'Content updated' : 'Content changed';
+          const newData = payload.new as PageSection | undefined;
+          const oldData = payload.old as PageSection | undefined;
+          window.dispatchEvent(new CustomEvent('realtime-update', {
+            detail: { message: `${eventName}: ${newData?.section_name || oldData?.section_name}` }
+          }));
+          
+          if (payload.eventType === 'UPDATE') {
+            const updatedSection = payload.new as PageSection;
+            setSections(prev => 
+              prev.map(section => 
+                section.section_name === updatedSection.section_name 
+                  ? updatedSection 
+                  : section
+              )
+            );
+          } else if (payload.eventType === 'INSERT') {
+            const newSection = payload.new as PageSection;
+            setSections(prev => {
+              const exists = prev.find(s => s.section_name === newSection.section_name);
+              if (!exists) {
+                return [...prev, newSection];
+              }
+              return prev.map(section => 
+                section.section_name === newSection.section_name 
+                  ? newSection 
+                  : section
+              );
+            });
+          } else if (payload.eventType === 'DELETE') {
+            const deletedSection = payload.old as PageSection;
+            setSections(prev => 
+              prev.filter(section => section.section_name !== deletedSection.section_name)
+            );
+          }
+        }
+      )
+      .subscribe();
+
+    subscriptionRef.current = subscription;
+  };
+
   useEffect(() => {
     fetchSections();
+    setupRealtimeSubscription();
+
+    return () => {
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+      }
+    };
   }, [sectionName]);
 
   const updateSection = async (

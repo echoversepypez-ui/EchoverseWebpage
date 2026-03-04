@@ -99,14 +99,14 @@ export function AccountsAvailableSection() {
   };
 
   return (
-    <section id="accounts-available" className="py-20 bg-gradient-to-b from-purple-50 via-white to-pink-50">
+    <section id="accounts-available" className="py-20 bg-linear-to-b from-purple-50 via-white to-pink-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-block px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-bold mb-4">
             💼 OPPORTUNITY LISTINGS
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+          <h2 className="text-4xl sm:text-5xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
             ESL Teaching Accounts Available
           </h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto leading-relaxed">
@@ -160,7 +160,7 @@ export function AccountsAvailableSection() {
                 setFilterStatus('all');
                 setSearchCountry('');
               }}
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition transform hover:scale-105"
+              className="px-8 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition transform hover:scale-105"
             >
               View All Accounts
             </button>
@@ -190,7 +190,7 @@ export function AccountsAvailableSection() {
                     </div>
                     <div className="text-right space-y-2">
                       {account.is_hiring && (
-                        <span className="inline-block px-3 py-1 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 text-xs font-black rounded-lg shadow-sm animate-pulse">
+                        <span className="inline-block px-3 py-1 bg-linear-to-r from-green-100 to-emerald-100 text-green-800 text-xs font-black rounded-lg shadow-sm">
                           🎯 HIRING NOW
                         </span>
                       )}
@@ -202,14 +202,14 @@ export function AccountsAvailableSection() {
                     </div>
                   </div>
 
-                  <div className="h-px bg-gradient-to-r from-purple-200 to-transparent mb-4"></div>
+                  <div className="h-px bg-linear-to-r from-purple-200 to-transparent mb-4"></div>
 
                   {/* Status & Rate */}
                   <div className="mb-4">
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Status</p>
                     <p className="text-sm font-semibold text-gray-700 mb-3">{account.status}</p>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                      <span className="text-4xl font-black bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                         ${account.rate_per_hour}
                       </span>
                       <span className="text-sm font-semibold text-gray-600">/hour</span>
@@ -241,7 +241,7 @@ export function AccountsAvailableSection() {
                   {/* CTA Button */}
                   <button
                     onClick={() => handleLearnMore(account)}
-                    className="block w-full text-center px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition transform hover:scale-105 duration-200 group-hover:from-purple-700 group-hover:to-pink-700"
+                    className="block w-full text-center px-4 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition transform hover:scale-105 duration-200 group-hover:from-purple-700 group-hover:to-pink-700"
                   >
                     Learn More →
                   </button>
@@ -254,15 +254,15 @@ export function AccountsAvailableSection() {
         {/* Stats */}
         {!loading && (
           <div className="grid md:grid-cols-3 gap-6 mt-10">
-            <div className="bg-gradient-to-br from-purple-100 to-purple-50 p-8 rounded-2xl text-center border-2 border-purple-200 shadow-lg">
+            <div className="bg-linear-to-br from-purple-100 to-purple-50 p-8 rounded-2xl text-center border-2 border-purple-200 shadow-lg">
               <p className="text-5xl font-black text-purple-600 mb-2">{accounts.length}</p>
               <p className="text-gray-700 font-bold">Total Accounts Available</p>
             </div>
-            <div className="bg-gradient-to-br from-green-100 to-green-50 p-8 rounded-2xl text-center border-2 border-green-200 shadow-lg">
+            <div className="bg-linear-to-br from-green-100 to-green-50 p-8 rounded-2xl text-center border-2 border-green-200 shadow-lg">
               <p className="text-5xl font-black text-green-600 mb-2">{accounts.filter(a => a.is_hiring).length}</p>
               <p className="text-gray-700 font-bold">Actively Hiring Now</p>
             </div>
-            <div className="bg-gradient-to-br from-blue-100 to-blue-50 p-8 rounded-2xl text-center border-2 border-blue-200 shadow-lg">
+            <div className="bg-linear-to-br from-blue-100 to-blue-50 p-8 rounded-2xl text-center border-2 border-blue-200 shadow-lg">
               <p className="text-5xl font-black text-blue-600 mb-2">
                 {accounts.reduce((sum, a) => sum + (a.available_slots || 0), 0).toLocaleString()}
               </p>
@@ -277,7 +277,7 @@ export function AccountsAvailableSection() {
         <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-purple-100">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 rounded-t-2xl flex justify-between items-center">
+            <div className="sticky top-0 bg-linear-to-r from-purple-600 to-pink-600 text-white p-6 rounded-t-2xl flex justify-between items-center">
               <div>
                 <h3 className="text-2xl font-bold flex items-center gap-3">
                   <span className="text-3xl">{selectedAccount.icon || '🌍'}</span>
@@ -344,7 +344,7 @@ export function AccountsAvailableSection() {
 
               {/* Hiring Badge */}
               {selectedAccount.is_hiring && (
-                <div className="bg-gradient-to-r from-green-100 to-emerald-100 p-4 rounded-lg text-center">
+                <div className="bg-linear-to-r from-green-100 to-emerald-100 p-4 rounded-lg text-center">
                   <p className="text-sm font-semibold text-green-800 mb-1">🎯 Status</p>
                   <p className="text-xl font-bold text-green-600">ACTIVELY HIRING NOW!</p>
                 </div>
@@ -363,7 +363,7 @@ export function AccountsAvailableSection() {
                 <Link
                   href="/contact"
                   onClick={closeModal}
-                  className="flex-1 text-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition"
+                  className="flex-1 text-center px-6 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold hover:shadow-lg transition"
                 >
                   Apply Now →
                 </Link>

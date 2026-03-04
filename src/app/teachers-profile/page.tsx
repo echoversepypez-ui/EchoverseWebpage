@@ -84,35 +84,35 @@ export default function TeachersProfilePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <section className="bg-linear-to-b from-purple-50 to-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h1 className="text-5xl sm:text-6xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+      <section className="bg-linear-to-b from-purple-50 to-white py-12 sm:py-16 lg:py-20">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+          <div className="text-center mb-8 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3 sm:mb-4">
               Our Experienced Teachers
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto px-4">
               Meet our talented team of certified ESL educators from around the world. Each teacher is carefully vetted and brings years of teaching experience.
             </p>
           </div>
 
           {/* Search and Filters */}
-          <div className="bg-white rounded-xl shadow-lg p-6 space-y-4">
+          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 space-y-3 sm:space-y-4">
             <div>
               <input
                 type="text"
                 placeholder="Search by name, qualification, or language..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 transition"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 transition text-sm sm:text-base"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Filter by Language</label>
+              <label className="block text-xs sm:text-sm font-semibold text-gray-900 mb-1 sm:mb-2">Filter by Language</label>
               <select
                 value={filterLanguage}
                 onChange={(e) => setFilterLanguage(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 transition"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-purple-600 transition text-sm sm:text-base"
               >
                 <option value="all">All Languages</option>
                 {allLanguages.map((language) => (
@@ -127,42 +127,42 @@ export default function TeachersProfilePage() {
       </section>
 
       {/* Teachers Grid */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
           {loading ? (
-            <div className="text-center py-12">
-              <p className="text-lg text-gray-600">Loading teacher profiles...</p>
+            <div className="text-center py-8 sm:py-12">
+              <p className="text-base sm:text-lg text-gray-600">Loading teacher profiles...</p>
             </div>
           ) : filteredTeachers.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
               {filteredTeachers.map((teacher) => (
                 <div
                   key={teacher.id}
-                  className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-200 hover:border-purple-400 overflow-hidden"
+                  className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-gray-200 hover:border-purple-400 overflow-hidden"
                 >
                   {/* Avatar/Icon */}
-                  <div className="h-48 bg-linear-to-br from-purple-100 to-pink-100 flex items-center justify-center text-7xl">
+                  <div className="h-36 sm:h-40 lg:h-48 bg-linear-to-br from-purple-100 to-pink-100 flex items-center justify-center text-4xl sm:text-5xl lg:text-7xl">
                     {teacher.name?.charAt(0).toUpperCase() || '👨‍🏫'}
                   </div>
 
                   {/* Content */}
-                  <div className="p-6">
+                  <div className="p-4 sm:p-6">
                     {/* Header */}
-                    <div className="mb-4">
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">{teacher.name}</h3>
-                      
+                    <div className="mb-3 sm:mb-4">
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">{teacher.name}</h3>
+                       
                       {/* Rating */}
                       {teacher.rating && (
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-sm">{getStarRating(teacher.rating)}</span>
-                          <span className="text-sm font-semibold text-gray-700">{teacher.rating}/5</span>
+                          <span className="text-xs sm:text-sm">{getStarRating(teacher.rating)}</span>
+                          <span className="text-xs sm:text-sm font-semibold text-gray-700">{teacher.rating}/5</span>
                         </div>
                       )}
 
                       {/* Qualification Badge */}
                       {teacher.qualification && (
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full font-semibold">
+                          <span className="text-xs bg-purple-100 text-purple-700 px-2 sm:px-3 py-1 rounded-full font-semibold">
                             {teacher.qualification}
                           </span>
                         </div>
@@ -170,51 +170,51 @@ export default function TeachersProfilePage() {
 
                       {/* Bio */}
                       {teacher.bio && (
-                        <p className="text-gray-700 text-sm leading-relaxed">{teacher.bio}</p>
+                        <p className="text-gray-700 text-xs sm:text-sm leading-relaxed">{teacher.bio}</p>
                       )}
                     </div>
 
                     {/* Details */}
-                    <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
+                    <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 pb-4 sm:pb-6 border-b border-gray-200">
                       {teacher.experience_years !== undefined && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Experience:</span>
-                          <span className="font-bold text-gray-900">{teacher.experience_years}+ years</span>
+                          <span className="text-xs sm:text-sm text-gray-600">Experience:</span>
+                          <span className="font-bold text-gray-900 text-xs sm:text-sm">{teacher.experience_years}+ years</span>
                         </div>
                       )}
 
                       {teacher.language && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Language:</span>
-                          <span className="font-bold text-purple-600">{teacher.language}</span>
+                          <span className="text-xs sm:text-sm text-gray-600">Language:</span>
+                          <span className="font-bold text-purple-600 text-xs sm:text-sm">{teacher.language}</span>
                         </div>
                       )}
 
                       {teacher.lessons_completed !== undefined && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Lessons:</span>
-                          <span className="font-bold text-gray-900">{teacher.lessons_completed}</span>
+                          <span className="text-xs sm:text-sm text-gray-600">Lessons:</span>
+                          <span className="font-bold text-gray-900 text-xs sm:text-sm">{teacher.lessons_completed}</span>
                         </div>
                       )}
 
                       {teacher.availability && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Availability:</span>
-                          <span className="font-bold text-green-600">{teacher.availability}</span>
+                          <span className="text-xs sm:text-sm text-gray-600">Availability:</span>
+                          <span className="font-bold text-green-600 text-xs sm:text-sm">{teacher.availability}</span>
                         </div>
                       )}
                     </div>
 
                     {/* Story */}
                     {teacher.story && (
-                      <div className="mb-6">
-                        <p className="text-xs font-semibold text-gray-900 mb-2 uppercase tracking-wide">About</p>
-                        <p className="text-gray-700 text-sm leading-relaxed italic">{teacher.story}</p>
+                      <div className="mb-4 sm:mb-6">
+                        <p className="text-xs font-semibold text-gray-900 mb-1 sm:mb-2 uppercase tracking-wide">About</p>
+                        <p className="text-gray-700 text-xs sm:text-sm leading-relaxed italic">{teacher.story}</p>
                       </div>
                     )}
 
                     {/* CTA Button */}
-                    <button className="w-full px-4 py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:opacity-90 transition">
+                    <button className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold text-sm sm:text-base hover:opacity-90 transition">
                       View Profile
                     </button>
                   </div>
@@ -222,14 +222,14 @@ export default function TeachersProfilePage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
-              <p className="text-lg text-gray-600 mb-4">No teachers found matching your criteria.</p>
+            <div className="text-center py-12 sm:py-16">
+              <p className="text-base sm:text-lg text-gray-600 mb-4">No teachers found matching your criteria.</p>
               <button
                 onClick={() => {
                   setSearchQuery('');
                   setFilterLanguage('all');
                 }}
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition"
+                className="px-4 sm:px-6 py-2 sm:py-3 bg-purple-600 text-white rounded-lg font-bold text-sm sm:text-base hover:bg-purple-700 transition"
               >
                 Clear Filters
               </button>
@@ -237,8 +237,8 @@ export default function TeachersProfilePage() {
           )}
 
           {/* Results Count */}
-          <div className="text-center mt-12">
-            <p className="text-gray-600">
+          <div className="text-center mt-8 sm:mt-12">
+            <p className="text-sm sm:text-base text-gray-600">
               Showing {filteredTeachers.length} of {teachers.length} teacher{teachers.length !== 1 ? 's' : ''}
             </p>
           </div>
@@ -246,17 +246,17 @@ export default function TeachersProfilePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-linear-to-br from-purple-50 to-pink-50 py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+      <section className="bg-linear-to-br from-purple-50 to-pink-50 py-12 sm:py-16">
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3 sm:mb-4">
             Become a Teacher
           </h2>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-lg sm:text-xl text-gray-600 mb-6 sm:mb-8">
             Join our growing community of ESL educators and earn premium income teaching international students.
           </p>
           <Link
             href="/contact"
-            className="inline-block px-8 py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold hover:opacity-90 transition"
+            className="inline-block px-6 sm:px-8 py-3 sm:py-4 bg-linear-to-r from-purple-600 to-pink-600 text-white rounded-lg font-bold text-sm sm:text-base hover:opacity-90 transition"
           >
             Apply to Teach with Us
           </Link>

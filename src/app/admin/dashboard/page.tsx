@@ -13,14 +13,48 @@ interface DashboardStats {
   unreadContacts: number;
   applications: number;
   newApplications: number;
+  pendingDemoRecordings: number;
+  approvedDemoRecordings: number;
+  rejectedDemoRecordings: number;
 }
 
-interface NavItem {
-  name: string;
-  href: string;
-  icon: string;
-  current: boolean;
-}
+const NavItem = ({ href, icon, label, isActive, badge, collapsed }: { 
+  href: string; 
+  icon: string; 
+  label: string; 
+  isActive: boolean; 
+  badge?: string | number;
+  collapsed?: boolean;
+}) => (
+  <Link
+    href={href}
+    className={`group relative flex items-center px-4 py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] ${
+      isActive
+        ? 'bg-white text-purple-700 shadow-lg border-l-4 border-purple-600'
+        : 'text-purple-100 hover:bg-white/10 hover:text-white hover:shadow-md border-l-4 border-transparent'
+    }`}
+    title={collapsed ? label : undefined}
+  >
+    <div className="flex items-center justify-between w-full">
+      <div className="flex items-center">
+        <span className={`text-xl transition-transform duration-300 shrink-0 w-6 text-center ${isActive ? 'scale-110' : 'group-hover:scale-110'}`}>{icon}</span>
+        {!collapsed && (
+          <span className="ml-3 font-medium text-sm">{label}</span>
+        )}
+      </div>
+      {badge && !collapsed && (
+        <span className="bg-linear-to-r from-pink-500 to-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md animate-pulse">
+          {badge}
+        </span>
+      )}
+    </div>
+    {collapsed && badge && (
+      <span className="absolute -top-1 -right-1 bg-linear-to-r from-pink-500 to-red-500 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md animate-pulse">
+        {badge}
+      </span>
+    )}
+  </Link>
+);
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -31,6 +65,9 @@ export default function AdminDashboardPage() {
     unreadContacts: 0,
     applications: 0,
     newApplications: 0,
+    pendingDemoRecordings: 0,
+    approvedDemoRecordings: 0,
+    rejectedDemoRecordings: 0,
   });
   const [statsLoading, setStatsLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState<string>('');
@@ -97,12 +134,31 @@ export default function AdminDashboardPage() {
         .select('*', { count: 'exact', head: true })
         .eq('status', 'new');
 
+      // Load demo recording statistics
+      const { count: pendingDemoCount } = await supabase
+        .from('applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('demo_recording_status', 'pending_review');
+
+      const { count: approvedDemoCount } = await supabase
+        .from('applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('demo_recording_status', 'approved');
+
+      const { count: rejectedDemoCount } = await supabase
+        .from('applications')
+        .select('*', { count: 'exact', head: true })
+        .eq('demo_recording_status', 'rejected');
+
       setStats({
         teachingAccounts: accountsCount || 0,
         contacts: contactsCount || 0,
         unreadContacts: unreadCount || 0,
         applications: applicationsCount || 0,
         newApplications: newAppsCount || 0,
+        pendingDemoRecordings: pendingDemoCount || 0,
+        approvedDemoRecordings: approvedDemoCount || 0,
+        rejectedDemoRecordings: rejectedDemoCount || 0,
       });
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -145,48 +201,93 @@ export default function AdminDashboardPage() {
     return null;
   }
 
-  const filteredNavItems = navigationItems.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-linear-to-br from-purple-50 via-pink-50 to-purple-50 flex flex-col md:flex-row">
         {/* Sidebar */}
         <aside className={`${
-          sidebarOpen ? 'w-64' : 'w-20'
-        } bg-linear-to-b from-purple-900 via-purple-800 to-purple-900 text-white transition-all duration-300 flex flex-col shadow-xl fixed md:static bottom-0 left-0 right-0 md:h-auto h-20 md:w-64 ${
-          sidebarOpen ? 'md:w-64' : 'md:w-20'
+          sidebarOpen ? 'w-72' : 'w-20'
+        } bg-linear-to-br from-purple-900 via-purple-800 to-indigo-900 backdrop-blur-lg text-white transition-all duration-500 ease-in-out flex flex-col shadow-2xl fixed md:static bottom-0 left-0 right-0 md:h-auto h-20 border-r border-purple-700/50 ${
+          sidebarOpen ? 'md:w-72' : 'md:w-20'
         } z-50`}>
           {/* Logo Section */}
-          <div className="p-4 md:p-6 border-b border-purple-700">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition">
-              <span className="text-3xl">🎓</span>
-              {sidebarOpen && <span className="text-xl font-bold">Echoverse</span>}
+          <div className="p-4 md:p-6 border-b border-purple-700/50 bg-linear-to-r from-purple-800/50 to-indigo-800/50 backdrop-blur-sm">
+            <Link href="/" className="flex items-center gap-3 group hover:opacity-90 transition-all duration-300">
+              <div className="relative flex items-center justify-center">
+                <span className="text-3xl transition-transform duration-300 group-hover:rotate-12 inline-block w-8 text-center">🎓</span>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse border-2 border-white"></div>
+              </div>
+              {sidebarOpen && (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold bg-linear-to-r from-white to-purple-200 bg-clip-text text-transparent">Echoverse</span>
+                  <span className="text-xs text-purple-200 font-medium">Admin Panel</span>
+                </div>
+              )}
             </Link>
           </div>
 
           {/* Navigation */}
-          <nav className="hidden md:flex flex-1 overflow-y-auto p-4 space-y-2 flex-col">
-            {navigationItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-purple-700 transition group"
-              >
-                <span className="text-2xl">{item.icon}</span>
-                {sidebarOpen && <span className="font-medium text-sm">{item.name}</span>}
-              </Link>
-            ))}
+          <nav className="hidden md:flex flex-1 overflow-y-auto p-4 space-y-1 flex-col scrollbar-thin scrollbar-thumb-purple-600/20 scrollbar-track-transparent">
+            {navigationItems
+              .filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
+              .map((item) => {
+                // Calculate badges for specific items
+                let badge = undefined;
+                if (item.name === 'Messages' && stats.unreadContacts > 0) {
+                  badge = stats.unreadContacts;
+                } else if (item.name === 'Applications' && stats.newApplications > 0) {
+                  badge = stats.newApplications;
+                } else if (item.name === 'Applications' && stats.pendingDemoRecordings > 0) {
+                  badge = `${stats.pendingDemoRecordings}📹`;
+                }
+                
+                return (
+                  <NavItem
+                    key={item.href}
+                    href={item.href}
+                    icon={item.icon}
+                    label={item.name}
+                    isActive={false} // You can implement active state logic here if needed
+                    badge={badge}
+                    collapsed={!sidebarOpen}
+                  />
+                );
+              })}
           </nav>
 
-          {/* Logout Button */}
-          <div className="hidden md:block p-4 border-t border-purple-700">
+          {/* Bottom Section - Issues & Logout */}
+          <div className="hidden md:block p-4 border-t border-purple-700/50 space-y-2">
+            {/* Issues Alert */}
+            {(stats.unreadContacts > 0 || stats.newApplications > 0 || stats.pendingDemoRecordings > 0) && (
+              <div className="bg-linear-to-r from-red-500/20 to-pink-500/20 backdrop-blur-sm border border-red-400/30 rounded-xl p-3">
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <span className="text-lg">⚠️</span>
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                      {(stats.unreadContacts + stats.newApplications + stats.pendingDemoRecordings) || 1}
+                    </span>
+                  </div>
+                  {sidebarOpen && (
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-white">Issues</p>
+                      <p className="text-xs text-purple-200">
+                        {stats.unreadContacts > 0 && `${stats.unreadContacts} messages`}
+                        {stats.unreadContacts > 0 && stats.newApplications > 0 && ', '}
+                        {stats.newApplications > 0 && `${stats.newApplications} apps`}
+                        {stats.pendingDemoRecordings > 0 && ` + ${stats.pendingDemoRecordings} demos`}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+            
+            {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-600 transition"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-400/30 hover:border-red-400/50 transition-all duration-300 group"
             >
-              <span className="text-xl">🚪</span>
+              <span className="text-xl transition-transform duration-300 group-hover:scale-110">🚪</span>
               {sidebarOpen && <span className="font-medium text-sm">Logout</span>}
             </button>
           </div>
@@ -239,8 +340,8 @@ export default function AdminDashboardPage() {
           {/* Main Content Area */}
           <main className="p-4 md:p-8">
             {/* Alert Section */}
-            {(stats.unreadContacts > 0 || stats.newApplications > 0) && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            {(stats.unreadContacts > 0 || stats.newApplications > 0 || stats.pendingDemoRecordings > 0) && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                 {stats.unreadContacts > 0 && (
                   <Link href="/admin/contacts">
                     <div className="bg-linear-to-r from-pink-500 to-red-500 text-white rounded-xl p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:scale-105 shadow-lg">
@@ -272,19 +373,35 @@ export default function AdminDashboardPage() {
                     </div>
                   </Link>
                 )}
+
+                {stats.pendingDemoRecordings > 0 && (
+                  <Link href="/admin/applications">
+                    <div className="bg-linear-to-r from-yellow-500 to-orange-500 text-white rounded-xl p-4 md:p-6 cursor-pointer hover:shadow-lg transition transform hover:scale-105 shadow-lg">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold text-lg mb-1">📹 Demo Reviews</h3>
+                          <p className="text-yellow-100">{stats.pendingDemoRecordings} recording{stats.pendingDemoRecordings !== 1 ? 's' : ''} pending review</p>
+                        </div>
+                        <span className="bg-white text-orange-500 rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
+                          {stats.pendingDemoRecordings}
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                )}
               </div>
             )}
 
             {/* Welcome Section */}
             <div className="mb-8 bg-linear-to-r from-purple-600 via-purple-600 to-pink-600 rounded-2xl p-4 md:p-8 text-white shadow-xl">
               <h1 className="text-2xl md:text-3xl font-bold mb-2">Welcome back, Admin 👋</h1>
-              <p className="text-purple-100">Here's your platform overview</p>
+              <p className="text-purple-100">Here&apos;s your platform overview</p>
             </div>
 
             {/* Key Metrics */}
             <div className="mb-8">
               <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4">Key Metrics</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4">
                 {/* Teachers */}
                 <div className="bg-white rounded-lg md:rounded-xl shadow-md p-3 md:p-6 border-l-4 border-purple-500 hover:shadow-lg transition">
                   <div className="flex items-start justify-between">
@@ -341,15 +458,45 @@ export default function AdminDashboardPage() {
                   </p>
                 </div>
 
-                {/* Quick Actions */}
-                <Link href="/admin/teaching-accounts" className="hidden md:col-span-5 lg:col-span-1 md:block">
-                  <div className="bg-linear-to-r from-purple-100 to-pink-100 rounded-lg md:rounded-xl shadow-md p-3 md:p-6 border-l-4 border-purple-500 hover:shadow-lg transition cursor-pointer h-full flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="text-xs md:text-sm font-semibold text-gray-700">Add New</p>
-                      <p className="text-lg md:text-2xl mt-1 md:mt-2">➕</p>
+                {/* Demo Recordings - Pending */}
+                <div className="bg-white rounded-lg md:rounded-xl shadow-md p-3 md:p-6 border-l-4 border-yellow-500 hover:shadow-lg transition">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:block">Demo</p>
+                      <p className="text-lg md:text-3xl font-bold text-yellow-600 mt-1 md:mt-2">{statsLoading ? '...' : stats.pendingDemoRecordings}</p>
                     </div>
+                    <span className="text-xl md:text-3xl">📹</span>
                   </div>
-                </Link>
+                  <p className="text-xs text-gray-500 mt-2 hidden md:block">
+                    <span className={stats.pendingDemoRecordings > 0 ? 'text-orange-500 font-bold' : ''}>
+                      Pending review
+                    </span>
+                  </p>
+                </div>
+
+                {/* Demo Recordings - Approved */}
+                <div className="bg-white rounded-lg md:rounded-xl shadow-md p-3 md:p-6 border-l-4 border-green-500 hover:shadow-lg transition">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:block">Approved</p>
+                      <p className="text-lg md:text-3xl font-bold text-green-600 mt-1 md:mt-2">{statsLoading ? '...' : stats.approvedDemoRecordings}</p>
+                    </div>
+                    <span className="text-xl md:text-3xl">✅</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 hidden md:block">Demo recordings</p>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="hidden lg:col-span-6 md:col-span-3 md:block">
+                  <Link href="/admin/teaching-accounts" className="block h-full">
+                    <div className="bg-linear-to-r from-purple-100 to-pink-100 rounded-lg md:rounded-xl shadow-md p-3 md:p-6 border-l-4 border-purple-500 hover:shadow-lg transition cursor-pointer h-full flex items-center justify-center">
+                      <div className="text-center">
+                        <p className="text-xs md:text-sm font-semibold text-gray-700">Add New</p>
+                        <p className="text-lg md:text-2xl mt-1 md:mt-2">➕</p>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
               </div>
             </div>
 
@@ -482,7 +629,7 @@ export default function AdminDashboardPage() {
 
             {/* Footer */}
             <div className="mt-8 md:mt-12 p-4 md:p-6 bg-white rounded-xl shadow-md text-center text-gray-600 text-xs md:text-sm">
-              <p>Echoverse Admin Panel • Last updated: {new Date().toLocaleString()}</p>
+              <p>Echoverse Admin Panel • Last updated: {isClient ? new Date().toLocaleString() : 'Loading...'}</p>
               <p className="mt-2 hidden md:block">Need help? Check our <Link href="#" className="text-purple-600 hover:underline">documentation</Link></p>
             </div>
           </main>

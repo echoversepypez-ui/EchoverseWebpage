@@ -28,6 +28,13 @@ interface Application {
   residing_antique: string;
   agreed_to_terms: boolean;
   status: 'new' | 'reviewed' | 'contacted' | 'approved' | 'rejected';
+  demo_recording_status: 'not_submitted' | 'pending_review' | 'approved' | 'rejected' | 'needs_revision';
+  demo_recording_review_result?: string;
+  demo_recording_submitted_date?: string;
+  demo_recording_review_notes?: string;
+  demo_recording_reviewed_by?: string;
+  demo_recording_reviewed_date?: string;
+  demo_recording_url?: string;
   created_at: string;
 }
 
@@ -55,6 +62,39 @@ export default function ApplicationsAdminPage() {
       console.error('Error loading applications:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateDemoRecordingStatus = async (id: string, newStatus: Application['demo_recording_status'], reviewData?: {
+    review_result?: string;
+    review_notes?: string;
+    submitted_date?: string;
+  }) => {
+    try {
+      const updateData: any = { demo_recording_status: newStatus };
+      
+      if (reviewData) {
+        if (reviewData.review_result !== undefined) updateData.demo_recording_review_result = reviewData.review_result;
+        if (reviewData.review_notes !== undefined) updateData.demo_recording_review_notes = reviewData.review_notes;
+        if (reviewData.submitted_date !== undefined) updateData.demo_recording_submitted_date = reviewData.submitted_date;
+      }
+      
+      // Add reviewer info and timestamp when status is being reviewed
+      if (newStatus !== 'not_submitted' && newStatus !== 'pending_review') {
+        updateData.demo_recording_reviewed_date = new Date().toISOString();
+      }
+      
+      const { error } = await supabase
+        .from('applications')
+        .update(updateData)
+        .eq('id', id);
+      if (error) throw error;
+      loadApplications();
+      if (selectedApplication?.id === id) {
+        setSelectedApplication({ ...selectedApplication, ...updateData });
+      }
+    } catch (error) {
+      console.error('Error updating demo recording status:', error);
     }
   };
 
@@ -89,6 +129,23 @@ export default function ApplicationsAdminPage() {
   const handleLogout = () => {
     logout();
     router.push('/');
+  };
+
+  const getDemoRecordingStatusColor = (status: string) => {
+    switch (status) {
+      case 'not_submitted':
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+      case 'pending_review':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      case 'approved':
+        return 'bg-green-100 text-green-800 border-green-300';
+      case 'rejected':
+        return 'bg-red-100 text-red-800 border-red-300';
+      case 'needs_revision':
+        return 'bg-orange-100 text-orange-800 border-orange-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -214,8 +271,12 @@ export default function ApplicationsAdminPage() {
                           </p>
                           <p>
                             <span className="font-semibold text-gray-900">Date Applied:</span>{' '}
-                            {new Date(selectedApplication.created_at).toLocaleDateString()} at{' '}
-                            {new Date(selectedApplication.created_at).toLocaleTimeString()}
+                            {new Date(selectedApplication.created_at).toLocaleDateString('en-US', { 
+                              timeZone: 'Asia/Manila',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true 
+                            })}
                           </p>
                           <p>
                             <span className="font-semibold text-gray-900">Agreed to Terms:</span>
@@ -282,6 +343,155 @@ export default function ApplicationsAdminPage() {
                         <p>
                           <span className="font-semibold">Residing in Antique:</span> {selectedApplication.residing_antique}
                         </p>
+                      </div>
+                    </div>
+
+                    {/* Demo Recording Management Section */}
+                    <div className="mb-6 pb-6 border-b-2 border-gray-200">
+                      <h3 className="font-bold text-gray-900 mb-4 text-lg flex items-center gap-2">
+                        📹 Demo Recording Management
+                      </h3>
+                      
+                      <div className="space-y-4">
+                        {/* Current Status Display */}
+                        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium text-gray-900">Current Status:</span>
+                            <span
+                              className={`px-3 py-1 text-sm font-semibold rounded border ${getDemoRecordingStatusColor(
+                                selectedApplication.demo_recording_status || 'not_submitted'
+                              )}`}
+                            >
+                              {(selectedApplication.demo_recording_status || 'not_submitted').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Submitted Date */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Submitted Date
+                            </label>
+                            <input
+                              type="date"
+                              value={selectedApplication.demo_recording_submitted_date?.split('T')[0] || ''}
+                              onChange={(e) => updateDemoRecordingStatus(selectedApplication.id, selectedApplication.demo_recording_status, {
+                                submitted_date: e.target.value ? new Date(e.target.value).toISOString() : undefined
+                              })}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            />
+                          </div>
+                          
+                          {/* Demo Recording URL */}
+                          {selectedApplication.demo_recording_url && (
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Demo Recording URL
+                              </label>
+                              <div className="p-2 bg-gray-50 border border-gray-200 rounded-lg">
+                                <a 
+                                  href={selectedApplication.demo_recording_url} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 text-sm truncate block"
+                                  title={selectedApplication.demo_recording_url}
+                                >
+                                  🔗 {selectedApplication.demo_recording_url}
+                                </a>
+                              </div>
+                            </div>
+                          )}
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                              Review Result
+                            </label>
+                            <input
+                              type="text"
+                              value={selectedApplication.demo_recording_review_result || ''}
+                              onChange={(e) => updateDemoRecordingStatus(selectedApplication.id, selectedApplication.demo_recording_status, {
+                                review_result: e.target.value
+                              })}
+                              placeholder="e.g., Approved - Excellent performance"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Review Notes */}
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Review Notes
+                          </label>
+                          <textarea
+                            value={selectedApplication.demo_recording_review_notes || ''}
+                            onChange={(e) => updateDemoRecordingStatus(selectedApplication.id, selectedApplication.demo_recording_status, {
+                              review_notes: e.target.value
+                            })}
+                            placeholder="Enter detailed review notes here..."
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                          />
+                        </div>
+
+                        {/* Status Update Buttons */}
+                        <div className="flex gap-3 flex-wrap pt-4 border-t">
+                          <button
+                            onClick={() => updateDemoRecordingStatus(selectedApplication.id, 'pending_review')}
+                            className={`px-4 py-2 rounded-lg font-semibold transition ${
+                              selectedApplication.demo_recording_status === 'pending_review'
+                                ? 'bg-yellow-600 text-white shadow-lg'
+                                : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                            }`}
+                          >
+                            ⏳ Mark as Pending Review
+                          </button>
+                          <button
+                            onClick={() => updateDemoRecordingStatus(selectedApplication.id, 'approved')}
+                            className={`px-4 py-2 rounded-lg font-semibold transition ${
+                              selectedApplication.demo_recording_status === 'approved'
+                                ? 'bg-green-600 text-white shadow-lg'
+                                : 'bg-green-100 text-green-700 hover:bg-green-200'
+                            }`}
+                          >
+                            ✓ Approve Recording
+                          </button>
+                          <button
+                            onClick={() => updateDemoRecordingStatus(selectedApplication.id, 'rejected')}
+                            className={`px-4 py-2 rounded-lg font-semibold transition ${
+                              selectedApplication.demo_recording_status === 'rejected'
+                                ? 'bg-red-600 text-white shadow-lg'
+                                : 'bg-red-100 text-red-700 hover:bg-red-200'
+                            }`}
+                          >
+                            ✗ Reject Recording
+                          </button>
+                          <button
+                            onClick={() => updateDemoRecordingStatus(selectedApplication.id, 'needs_revision')}
+                            className={`px-4 py-2 rounded-lg font-semibold transition ${
+                              selectedApplication.demo_recording_status === 'needs_revision'
+                                ? 'bg-orange-600 text-white shadow-lg'
+                                : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                            }`}
+                          >
+                            🔄 Request Revision
+                          </button>
+                        </div>
+
+                        {/* Review Information */}
+                        {selectedApplication.demo_recording_reviewed_date && (
+                          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p className="text-sm text-blue-900">
+                              <strong>Last Reviewed:</strong> {new Date(selectedApplication.demo_recording_reviewed_date).toLocaleDateString('en-US', { 
+                                timeZone: 'Asia/Manila',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true 
+                              })}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
 
