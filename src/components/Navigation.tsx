@@ -36,7 +36,16 @@ export const Navigation = ({ activeLink = '' }: NavigationProps) => {
 
   // Show mobile navigation for mobile and tablet devices
   if (isMobile || isTablet) {
-    return <MobileNavigation activeLink={activeLink} />;
+    return (
+      <MobileNavigation 
+        activeLink={activeLink}
+        user={user}
+        displayName={displayName}
+        applicantLoading={applicantLoading}
+        isApplicantLoggedIn={isApplicantLoggedIn}
+        signOut={signOut}
+      />
+    );
   }
 
   // Desktop navigation

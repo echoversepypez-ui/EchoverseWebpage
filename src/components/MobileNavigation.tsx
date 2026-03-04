@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
-import { useApplicantAuth } from '@/lib/applicant-auth-context';
+import type { User } from '@supabase/supabase-js';
 import { useMobileDetection } from '@/hooks/useMobileDetection';
 
 interface NavLink {
@@ -15,14 +15,24 @@ interface NavLink {
 
 interface MobileNavigationProps {
   activeLink?: string;
+  user: User | null;
+  displayName: string;
+  applicantLoading: boolean;
+  isApplicantLoggedIn: boolean;
+  signOut: () => Promise<void>;
 }
 
-export const MobileNavigation = ({ activeLink = '' }: MobileNavigationProps) => {
+export const MobileNavigation = ({ 
+  activeLink = '', 
+  user, 
+  displayName, 
+  applicantLoading, 
+  isApplicantLoggedIn, 
+  signOut 
+}: MobileNavigationProps) => {
   const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, displayName, isLoading: applicantLoading, signOut } = useApplicantAuth();
   const { isMobile, isTablet } = useMobileDetection();
-  const isApplicantLoggedIn = !!user;
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleLogout = () => {
@@ -160,7 +170,7 @@ export const MobileNavigation = ({ activeLink = '' }: MobileNavigationProps) => 
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold text-gray-800">{displayName || 'Applicant'}</p>
-                      <p className="text-sm text-gray-600 truncate">{user.email}</p>
+                      <p className="text-sm text-gray-600 truncate">{user?.email}</p>
                     </div>
                   </div>
                   <div className="mt-3 flex gap-2">
