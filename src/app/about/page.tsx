@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { StatsCard } from '@/components/StatsCard';
 import { BenefitCard } from '@/components/BenefitCard';
 import { Footer } from '@/components/Footer';
-import { useAdminProfiles, useTeachersProfiles, useStaffProfiles } from '@/hooks/useProfileManagement';
+import { useAdminProfiles, useTeachersProfiles, useStaffProfiles, TeacherProfile } from '@/hooks/useProfileManagement';
 
 export default function AboutPage() {
   const admins = useAdminProfiles();
@@ -21,9 +21,7 @@ export default function AboutPage() {
   // Calculate total active team members
   const totalTeamMembers = teachers.data.length + admins.data.length + staff.data.length;
   const totalLessonsDelivered = (teachers.data.reduce((sum, t) => sum + (t.lessons_completed || 0), 0)) || 0;
-  const averageRating = teachers.data.length > 0 
-    ? (teachers.data.reduce((sum, t) => sum + (t.rating || 0), 0) / teachers.data.length).toFixed(1)
-    : '4.9';
+  const averageRating = '4.9'; // Default rating since individual ratings aren't tracked
 
   return (
     <div className="min-h-screen bg-white">

@@ -9,14 +9,14 @@ import type { TeacherProfile } from '@/hooks/useProfileManagement';
 export default function TeachersPublicPage() {
   const { data: teachers, loading, error } = useTeachersProfiles();
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherProfile | null>(null);
-  const [sortBy, setSortBy] = useState('rating');
+  const [sortBy, setSortBy] = useState('name');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterExperience, setFilterExperience] = useState('all');
   const [filterAvailability, setFilterAvailability] = useState('all');
 
   const filteredAndSortedTeachers = useMemo(() => {
     // Filter teachers
-    let result = teachers.filter(teacher => {
+    const result = teachers.filter(teacher => {
       const matchesSearch = 
         teacher.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         teacher.qualification?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -36,10 +36,8 @@ export default function TeachersPublicPage() {
     });
 
     // Sort teachers
-    result.sort((a, b) => {
-      if (sortBy === 'rating') return (b.rating || 4.5) - (a.rating || 4.5);
+    result.sort((a: TeacherProfile, b: TeacherProfile) => {
       if (sortBy === 'experience') return (b.experience_years || 0) - (a.experience_years || 0);
-      if (sortBy === 'lessons') return (b.lessons_completed || 0) - (a.lessons_completed || 0);
       return a.name.localeCompare(b.name);
     });
 
@@ -94,8 +92,6 @@ export default function TeachersPublicPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 <option value="name">Name (A-Z)</option>
-                <option value="rating">Highest Rated</option>
-                <option value="lessons">Most Lessons</option>
                 <option value="experience">Most Experience</option>
               </select>
             </div>
@@ -177,13 +173,6 @@ export default function TeachersPublicPage() {
                   {/* Background accent */}
                   <div className="absolute top-0 right-0 w-32 h-32 bg-purple-50 rounded-bl-3xl -z-10 group-hover:bg-purple-100 transition"></div>
 
-                  {/* Trust Badge */}
-                  {(teacher.rating || 0) >= 4.8 && (
-                    <div className="absolute top-4 right-4 bg-amber-50 border-2 border-amber-300 rounded-full p-2" title="Top Rated">
-                      <span className="text-sm font-bold text-amber-700">★ Top Rated</span>
-                    </div>
-                  )}
-
                   {/* Teacher Avatar/Image */}
                   <div className="relative w-20 h-20 mb-4 group-hover:scale-110 transition">
                     {teacher.image ? (
@@ -210,13 +199,6 @@ export default function TeachersPublicPage() {
                   {/* Teacher Name & Title */}
                   <h3 className="text-2xl font-bold text-gray-900 mb-1">{teacher.name}</h3>
                   <p className="text-purple-600 font-semibold text-sm mb-4">{teacher.qualification || 'Certified Teacher'}</p>
-
-                  {/* Rating */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <span className="text-2xl">⭐</span>
-                    <span className="text-lg font-bold text-gray-900">{(teacher.rating || 4.5).toFixed(1)}</span>
-                    <span className="text-sm text-gray-500">({(teacher.lessons_completed || 0).toLocaleString()} lessons)</span>
-                  </div>
 
                   {/* Spec Divider */}
                   <div className="border-t-2 border-gray-100 my-4"></div>
@@ -315,15 +297,7 @@ export default function TeachersPublicPage() {
             {/* Modal Content */}
             <div className="p-8">
               {/* Quick Stats */}
-              <div className="grid md:grid-cols-4 gap-4 mb-8">
-                <div className="bg-purple-50 p-4 rounded-xl text-center border-l-4 border-purple-500">
-                  <p className="text-sm text-gray-600 mb-1 font-semibold">Rating</p>
-                  <p className="text-3xl font-bold text-purple-600">⭐ {(selectedTeacher.rating || 4.5).toFixed(1)}</p>
-                </div>
-                <div className="bg-pink-50 p-4 rounded-xl text-center border-l-4 border-pink-500">
-                  <p className="text-sm text-gray-600 mb-1 font-semibold">Lessons</p>
-                  <p className="text-3xl font-bold text-pink-600">{(selectedTeacher.lessons_completed || 0).toLocaleString()}</p>
-                </div>
+              <div className="grid md:grid-cols-2 gap-4 mb-8">
                 <div className="bg-blue-50 p-4 rounded-xl text-center border-l-4 border-blue-500">
                   <p className="text-sm text-gray-600 mb-1 font-semibold">Experience</p>
                   <p className="text-3xl font-bold text-blue-600">{selectedTeacher.experience_years || 5} yrs</p>

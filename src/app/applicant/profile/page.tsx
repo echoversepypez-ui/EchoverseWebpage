@@ -513,103 +513,119 @@ export default function ProfileDashboardPage() {
                 ) : (
                   <div className="space-y-4">
                     {applications.map((app) => (
-                      <div key={app.id} className="bg-white border border-gray-200 rounded-xl p-6 hover:border-purple-200 transition-all duration-200">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">{app.name}</h3>
-                            <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                              <span>📧 {app.email}</span>
-                              <span>📱 {app.phone}</span>
-                              <span>📅 {new Date(app.created_at).toLocaleDateString()}</span>
+                      <React.Fragment key={app.id}>
+                        <div className="bg-white border border-gray-200 rounded-xl p-6 hover:border-purple-200 transition-all duration-200">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex-1">
+                              <h3 className="text-lg font-semibold text-gray-900 mb-2">{app.name}</h3>
+                              <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                                <span>📧 {app.email}</span>
+                                <span>📱 {app.phone}</span>
+                                <span>📅 {new Date(app.created_at).toLocaleDateString()}</span>
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                              <span className={`px-3 py-1 rounded-full text-xs font-semibold text-center ${
+                                STATUS_COLORS[app.status] ?? 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {STATUS_LABELS[app.status] ?? app.status}
+                              </span>
+                              <span className={`px-3 py-1 rounded-full text-xs font-semibold text-center ${
+                                DEMO_RECORDING_STATUS_COLORS[app.demo_recording_status] || 'bg-gray-100 text-gray-800'
+                              }`}>
+                                Demo: {DEMO_RECORDING_STATUS_LABELS[app.demo_recording_status] || app.demo_recording_status}
+                              </span>
                             </div>
                           </div>
-                          <div className="flex flex-col gap-2">
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold text-center ${
-                              STATUS_COLORS[app.status] ?? 'bg-gray-100 text-gray-800'
-                            }`}>
-                              {STATUS_LABELS[app.status] ?? app.status}
-                            </span>
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold text-center ${
-                              DEMO_RECORDING_STATUS_COLORS[app.demo_recording_status] || 'bg-gray-100 text-gray-800'
-                            }`}>
-                              Demo: {DEMO_RECORDING_STATUS_LABELS[app.demo_recording_status] || app.demo_recording_status}
-                            </span>
+                          
+                          {/* Demo Recording Section */}
+                          <div className="mt-4 pt-4 border-t border-gray-200">
+                            <div className="bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50 border border-indigo-200 rounded-xl p-4">
+                              <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <div className={`w-3 h-3 rounded-full ${
+                                      app.demo_recording_status === 'pending_review' ? 'bg-yellow-400 animate-pulse' :
+                                      app.demo_recording_status === 'approved' ? 'bg-green-400' :
+                                      app.demo_recording_status === 'rejected' ? 'bg-red-400' :
+                                      app.demo_recording_status === 'needs_revision' ? 'bg-orange-400' :
+                                      'bg-gray-400'
+                                    }`}></div>
+                                    <span className="text-sm font-medium text-gray-900">Demo Status</span>
+                                  </div>
+                                  <span className={`text-sm font-bold px-2 py-1 rounded ${
+                                    DEMO_RECORDING_STATUS_COLORS[app.demo_recording_status] || 'bg-gray-100 text-gray-800'
+                                  }`}>
+                                    {DEMO_RECORDING_STATUS_LABELS[app.demo_recording_status] || app.demo_recording_status}
+                                  </span>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                  <div className="bg-white p-3 rounded-lg border border-gray-200">
+                                    <p className="text-xs text-gray-600 mb-1">Submitted</p>
+                                    <p className="text-sm font-semibold text-gray-900">
+                                      {app.demo_recording_submitted_date 
+                                        ? new Date(app.demo_recording_submitted_date).toLocaleDateString()
+                                        : 'Not submitted'
+                                      }
+                                    </p>
+                                  </div>
+                                  <div className="bg-white p-3 rounded-lg border border-gray-200">
+                                    <p className="text-xs text-gray-600 mb-1">Review Result</p>
+                                    <p className="text-sm font-semibold text-gray-900">
+                                      {app.demo_recording_review_result || 'Awaiting Review'}
+                                    </p>
+                                  </div>
+                                  <div className="bg-white p-3 rounded-lg border border-gray-200">
+                                    <p className="text-xs text-gray-600 mb-1">Review Date</p>
+                                    <p className="text-sm font-semibold text-gray-900">
+                                      {app.demo_recording_reviewed_date 
+                                        ? new Date(app.demo_recording_reviewed_date).toLocaleDateString('en-US', { 
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric'
+                                          })
+                                        : 'Not reviewed'
+                                      }
+                                    </p>
+                                  </div>
+                                </div>
+                                
+                                {app.demo_recording_review_notes && (
+                                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                                    <p className="text-xs font-medium text-amber-900 mb-1">Review Notes:</p>
+                                    <p className="text-sm text-amber-800">{app.demo_recording_review_notes}</p>
+                                  </div>
+                                )}
+                                
+                                {app.demo_recording_url && (
+                                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                                    <a 
+                                      href={app.demo_recording_url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-green-800 hover:text-green-900 text-sm font-medium flex items-center gap-2"
+                                    >
+                                      <span>🔗</span>
+                                      View Demo Recording
+                                    </a>
+                                  </div>
+                                )}
+                                
+                                {(app.demo_recording_status === 'not_submitted' || app.demo_recording_status === 'needs_revision') && (
+                                  <button 
+                                    onClick={() => openDemoRecordingModal(app.id)}
+                                    className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors duration-200"
+                                  >
+                                    {app.demo_recording_status === 'needs_revision' ? '🔄 Resubmit Demo' : '📹 Submit Demo Recording'}
+                                  </button>
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </div>
                         
-                        {/* Demo Recording Section */}
-                        <div className="mt-4 pt-4 border-t border-gray-200">
-                          <div className="bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50 border border-indigo-200 rounded-xl p-4">
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                  <div className={`w-3 h-3 rounded-full ${
-                                    app.demo_recording_status === 'pending_review' ? 'bg-yellow-400 animate-pulse' :
-                                    app.demo_recording_status === 'approved' ? 'bg-green-400' :
-                                    app.demo_recording_status === 'rejected' ? 'bg-red-400' :
-                                    app.demo_recording_status === 'needs_revision' ? 'bg-orange-400' :
-                                    'bg-gray-400'
-                                  }`}></div>
-                                  <span className="text-sm font-medium text-gray-900">Demo Status</span>
-                                </div>
-                                <span className={`text-sm font-bold px-2 py-1 rounded ${
-                                  DEMO_RECORDING_STATUS_COLORS[app.demo_recording_status] || 'bg-gray-100 text-gray-800'
-                                }`}>
-                                  {DEMO_RECORDING_STATUS_LABELS[app.demo_recording_status] || app.demo_recording_status}
-                                </span>
-                              </div>
-                              
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div className="bg-white p-3 rounded-lg border border-gray-200">
-                                  <p className="text-xs text-gray-600 mb-1">Submitted</p>
-                                  <p className="text-sm font-semibold text-gray-900">
-                                    {app.demo_recording_submitted_date 
-                                      ? new Date(app.demo_recording_submitted_date).toLocaleDateString()
-                                      : 'Not submitted'
-                                    }
-                                  </p>
-                                </div>
-                                <div className="bg-white p-3 rounded-lg border border-gray-200">
-                                  <p className="text-xs text-gray-600 mb-1">Review Result</p>
-                                  <p className="text-sm font-semibold text-gray-900">
-                                    {app.demo_recording_review_result || 'Awaiting Review'}
-                                  </p>
-                                </div>
-                              </div>
-                              
-                              {app.demo_recording_review_notes && (
-                                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                                  <p className="text-xs font-medium text-amber-900 mb-1">Review Notes:</p>
-                                  <p className="text-sm text-amber-800">{app.demo_recording_review_notes}</p>
-                                </div>
-                              )}
-                              
-                              {app.demo_recording_url && (
-                                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                                  <a 
-                                    href={app.demo_recording_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-green-800 hover:text-green-900 text-sm font-medium flex items-center gap-2"
-                                  >
-                                    <span>🔗</span>
-                                    View Demo Recording
-                                  </a>
-                                </div>
-                              )}
-                              
-                              {(app.demo_recording_status === 'not_submitted' || app.demo_recording_status === 'needs_revision') && (
-                                <button 
-                                  onClick={() => openDemoRecordingModal(app.id)}
-                                  className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors duration-200"
-                                >
-                                  {app.demo_recording_status === 'needs_revision' ? '🔄 Resubmit Demo' : '📹 Submit Demo Recording'}
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                                              </React.Fragment>
                     ))}
                   </div>
                 )}

@@ -12,115 +12,105 @@ export default function PrivacyPolicy() {
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
           <p className="text-lg text-gray-600 mb-8">Echoverse Online Tutorial Services</p>
-          <p className="text-sm text-gray-500 mb-8">Last Updated: March 4, 2026</p>
+          <p className="text-sm text-gray-500 mb-8">Last Updated: March 6, 2026</p>
           
           <div className="prose prose-lg max-w-none">
             <p className="mb-6">
-              Echoverse Online Tutorial Services (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;, or &ldquo;Echoverse&rdquo;) operates the website 
-              https://echoverseonlinetutorialservices.vercel.app (the &ldquo;Site&rdquo;) to connect certified ESL and online tutors 
-              with teaching opportunities and global learners, primarily in Asia (e.g., Japan, Korea, China).
+              Echoverse Online Tutorial Services (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;, or &ldquo;Echoverse&rdquo;) operates 
+              https://echoverseonlinetutorialservices.vercel.app (the &ldquo;Site&rdquo;) to connect certified ESL/online tutors with premium teaching opportunities across Asia (e.g., Japan, Korea, China accounts).
             </p>
             
             <p className="mb-6">
-              We are committed to protecting your privacy in compliance with Republic Act No. 10173 (Data Privacy Act of 2012) 
-              of the Philippines and other applicable laws. This Privacy Policy explains how we collect, use, disclose, store, 
-              and protect personal information when you visit the Site, apply as a teacher, submit inquiries, or interact with our services.
+              We protect personal information in compliance with Republic Act No. 10173 (Data Privacy Act of 2012) and Philippine laws.
             </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">1. Information We Collect</h2>
-            <p className="mb-4">We collect:</p>
             <ul className="list-disc pl-6 mb-6 space-y-2">
               <li>
-                <strong>From teacher applicants/teachers:</strong> Full name, email, phone (optional), location/nationality, 
-                date of birth (for age verification only), educational background, teaching certifications (e.g., TEFL, CELTA), 
-                years of experience, resume/CV, diplomas/certificates, preferred teaching hours, reasons for joining, 
-                video interview details (if conducted), and any other information you provide during application/review/onboarding.
+                <strong>Teacher applicants:</strong> Name, email, phone, location/nationality, DOB (verification only), education, certifications (TEFL/CELTA/etc.), experience, resume/CV, diplomas, preferred hours, reasons, video interviews, demo recordings.
               </li>
               <li>
-                <strong>Public teacher profiles (for approved teachers):</strong> Professional photo/avatar, full name, 
-                short bio, qualifications, experience, specializations, languages/proficiency, availability (e.g., full-time/part-time), 
-                ratings/reviews summary, lessons taught count, and other profile fields.
+                <strong>Public profiles (consented):</strong> Photo/avatar, name, bio, qualifications, experience, specializations, languages, availability, ratings summary, lessons taught.
               </li>
               <li>
-                <strong>Automatically:</strong> IP address, browser/device type, pages visited, time/date of access, 
-                referral sources (via server logs and analytics).
+                <strong>Inquiries/clients (students/parents):</strong> Contact details, needs.
               </li>
               <li>
-                <strong>From inquiries/other:</strong> Any details you voluntarily submit (e.g., messages via contact forms).
+                <strong>Automatic:</strong> IP, browser/device, access logs. No sensitive data unless voluntarily relevant/consented.
               </li>
             </ul>
-            
-            <p className="mb-6">
-              We do not collect sensitive personal information (e.g., health, race, religion) unless voluntarily provided 
-              and relevant to teaching qualifications.
-            </p>
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">2. How We Use Your Information</h2>
-            <p className="mb-4">We use it to:</p>
             <ul className="list-disc pl-6 mb-6 space-y-2">
-              <li>Process and evaluate teacher applications, conduct reviews/interviews, provide training/orientation, and manage teaching accounts/opportunities.</li>
-              <li>Create and publicly display teacher profiles on the Site (e.g., /teachers-profile) to promote services, build trust, and connect teachers with students.</li>
-              <li>Communicate with you (application status, updates, support).</li>
-              <li>Improve the Site, prevent fraud/abuse, and comply with legal obligations.</li>
-              <li>Aggregate anonymized data for statistics (e.g., active teachers, ratings).</li>
+              <li>Process applications/vetting/interviews/training, display consented profiles, match opportunities, respond to inquiries, communicate, improve Site, fraud prevention, legal compliance, anonymized stats.</li>
             </ul>
 
             <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">3. Sharing and Disclosure</h2>
-            <p className="mb-4">We do not sell personal information. We may share it with:</p>
+            <p className="mb-4">No selling of personal information. Sharing limited to:</p>
             <ul className="list-disc pl-6 mb-6 space-y-2">
-              <li>Service providers (e.g., Vercel for hosting, email tools, analytics providers) bound by confidentiality.</li>
-              <li>Potential students/clients (via public profiles) for evaluation and matching.</li>
-              <li>Legal authorities if required by law, court order, or to protect rights/safety.</li>
-              <li>In case of merger, acquisition, or asset sale.</li>
+              <li>Authorized providers (Vercel, email/analytics) under confidentiality.</li>
+              <li>Public teacher profiles (consented elements only via Teacher Profile Consent Form).</li>
+              <li>Legal requirements, rights/safety protection, business transfers.</li>
             </ul>
             
+            <p className="mb-4 font-semibold">Prohibition on Sharing Client Information:</p>
             <p className="mb-6">
-              Public profile data is intentionally shared worldwide via the Site and promotional channels.
+              Client information (teacher applicants, non-public profile details, student/parent inquiries, demo recordings, application status, internal notes) is strictly prohibited from being shared publicly (social media, forums, websites, open channels) or with unauthorized third parties without explicit consent or lawful basis. Violations are Unauthorized/Malicious Disclosure (Data Privacy Act Sections 31-32), punishable by 1-5+ years imprisonment and Php 500,000–2,000,000+ fines.
             </p>
 
-            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">4. Cookies and Tracking</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">4. Internal Handling and Confidentiality</h2>
+            <p className="mb-4">All data/documents/records are strictly confidential.</p>
+            <p className="mb-4"><strong>Access:</strong> Need-to-know basis only for authorized personnel.</p>
+            <p className="mb-4"><strong>Prohibited without explicit prior written consent from HR/Admin:</strong></p>
+            <ul className="list-disc pl-6 mb-6 space-y-2">
+              <li>Screenshots, photos, scans, reproductions.</li>
+              <li>Uploading, forwarding, sharing, emailing, messaging, disseminating (internal/external).</li>
+              <li>Copying/downloading to personal devices/unauthorized storage.</li>
+              <li>Discussing/disclosing unauthorized.</li>
+            </ul>
             <p className="mb-6">
-              We use essential cookies for functionality and may use analytics cookies (e.g., for traffic insights). 
-              You can manage preferences via browser settings. No targeted advertising currently.
+              Breaches = serious policy violation + Data Privacy Act offenses (Sections 25-32), leading to discipline (up to termination), civil/criminal liability, NPC reporting. Confidentiality continues post-employment.
+            </p>
+            <p className="mb-6"><strong>Security:</strong> Access controls, encryption, training, monitoring.</p>
+
+            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">5. Cookies and Tracking</h2>
+            <p className="mb-6">
+              Essential/analytics cookies; browser-manageable. No targeted ads.
             </p>
 
-            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">5. Data Security</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">6. Data Security</h2>
             <p className="mb-6">
-              We use reasonable measures (e.g., encryption where applicable, access controls) to protect data. 
-              However, no internet transmission is fully secure.
+              Reasonable measures. Breach notification to individuals/NPC as required.
             </p>
 
-            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">6. Data Retention</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">7. Data Retention</h2>
             <p className="mb-6">
-              We retain application/profile data as long as needed for purposes above or legal requirements. 
-              Inactive profiles may be archived/removed upon request.
+              As needed for purposes/legal requirements; removable upon valid request.
             </p>
 
-            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">7. Your Rights (Under Philippine DPA and Applicable Laws)</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">8. Your Rights</h2>
             <p className="mb-6">
-              You have rights to access, correct, object to processing, suspend/remove, or erase your personal data. 
-              For public profiles, consent-based revocation applies (see your signed Consent Form). 
-              Contact us to exercise rights; we respond promptly and reasonably.
+              Access, correction, objection, erasure, etc. Contact us (public profile revocation per Consent Form).
             </p>
 
-            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">8. Children's Privacy</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">9. Children&apos;s Privacy</h2>
             <p className="mb-6">
-              The Site is not for children under 18. We do not knowingly collect data from minors.
+              Not for under 18.
             </p>
 
-            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">9. International Transfers</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">10. International Transfers</h2>
             <p className="mb-6">
-              Data may be processed/stored outside the Philippines (e.g., Vercel servers). We ensure adequate protections.
+              Adequate protections (e.g., Vercel servers).
             </p>
 
-            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">10. Changes</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">11. Changes</h2>
             <p className="mb-6">
-              We may update this Policy; changes posted here with new date. Continued use = acceptance.
+              Posted updates; continued use = acceptance.
             </p>
 
-            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">11. Contact</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-4">Contact</h2>
             <div className="mb-6">
-              <p className="mb-2"><strong>Questions?</strong> Email: support@echoverseonlinetutorialservices.vercel.app</p>
+              <p className="mb-2"><strong>Email:</strong> evstaffspprt@gmail.com</p>
               <p><strong>Location:</strong> San Jose Antique, Philippines</p>
             </div>
             

@@ -2,13 +2,18 @@
 
 declare global {
   interface Window {
-    Tawk_API?: any;
+    Tawk_API?: {
+      maximize?: () => void;
+      showWidget?: () => void;
+      hideWidget?: () => void;
+      onChatMinimized?: () => void;
+    };
   }
 }
 
 import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
-import { useChatbotOptions } from '@/hooks/useChatbotOptions';
+import { useChatbotOptions, ChatbotOption } from '@/hooks/useChatbotOptions';
 import { useSystemSettings } from '@/hooks/useSystemSettings';
 import { useAdminConversations } from '@/hooks/useAdminConversations';
 import { useConversationMessages } from '@/hooks/useConversationMessages';
@@ -16,9 +21,9 @@ import { useConversationMessages } from '@/hooks/useConversationMessages';
 import { supabase } from '@/lib/supabase';
 import styles from './SupportChatbot.module.css';
 
-interface Message {
+export interface Message {
   id: string;
-  type: 'bot' | 'user' | 'system';
+  type: 'bot' | 'user' | 'system' | 'admin';
   content: string;
   timestamp: Date;
   senderName?: string;
@@ -27,13 +32,13 @@ interface Message {
 interface CategoryGroup {
   name: string;
   icon: string;
-  items: any[];
+  items: ChatbotOption[];
 }
 
 export function SupportChatbot() {
   const pathname = usePathname();
   const { options, loading } = useChatbotOptions();
-  const { getBooleanSetting, loading: settingsLoading, refresh } = useSystemSettings();
+  const { getBooleanSetting, loading: settingsLoading } = useSystemSettings();
   const { createConversation } = useAdminConversations();
   
   // using internal chat support; external widget initialization removed
@@ -41,13 +46,13 @@ export function SupportChatbot() {
   // State
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState<'menu' | 'category' | 'content' | 'guest-info' | 'admin-chat'>('menu');
-  const [selectedOption, setSelectedOption] = useState<any>(null);
+  const [selectedOption, setSelectedOption] = useState<ChatbotOption | null>(null);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [localMessages, setLocalMessages] = useState<Message[]>([
     {
       id: '1',
       type: 'bot',
-      content: "How can I help? 👋",
+      content: "How can I help? ",
       timestamp: new Date(),
     },
   ]);
@@ -58,15 +63,15 @@ export function SupportChatbot() {
   const [isChatbotEnabled, setIsChatbotEnabled] = useState(true);
   const [guestId, setGuestId] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [openingHubSpot, setOpeningHubSpot] = useState(false);
   // whether the external Tawk.to widget is active
   const [showTawk, setShowTawk] = useState(false);
   
   // Hook for conversation messages - will subscribe when conversationId is set
-  const { messages: dbMessages, loading: messagesLoading } = useConversationMessages(conversationId);
+  const { messages: dbMessages } = useConversationMessages(conversationId);
   const [isCreatingConversation, setIsCreatingConversation] = useState(false);
-  const [retryCount, setRetryCount] = useState(0);
   const [showFallback, setShowFallback] = useState(false);
+  const [quickQuestion, setQuickQuestion] = useState('');
+  const [isSubmittingQuestion, setIsSubmittingQuestion] = useState(false);
   
   const prevEnabledRef = useRef<boolean>(true);
   const guestIdRef = useRef<string | null>(null);
@@ -97,8 +102,12 @@ export function SupportChatbot() {
       const chatbotEnabled = getBooleanSetting('chatbot_enabled');
       setIsChatbotEnabled(chatbotEnabled);
       prevEnabledRef.current = chatbotEnabled;
+    } else if (settingsLoading) {
+      // Default to enabled while loading to prevent flickering
+      setIsChatbotEnabled(true);
+      prevEnabledRef.current = true;
     }
-  }, [isAdminPage, settingsLoading]);
+  }, [isAdminPage, settingsLoading, getBooleanSetting]);
 
   // when using external widget, the internal UI is suppressed.
   // load tawk script lazily and register event callbacks
@@ -120,8 +129,8 @@ export function SupportChatbot() {
 
       // show / maximize widget
       const openCheck = setInterval(() => {
-        if (window.Tawk_API && window.Tawk_API.maximize) {
-          window.Tawk_API.showWidget && window.Tawk_API.showWidget();
+        if (window.Tawk_API?.maximize) {
+          window.Tawk_API.showWidget?.();
           window.Tawk_API.maximize();
           clearInterval(openCheck);
         }
@@ -145,8 +154,8 @@ export function SupportChatbot() {
   }, [showTawk]);
 
   // Group options by category for better organization
-  const groupedOptions = options.reduce((acc: { [key: string]: CategoryGroup }, option: any) => {
-    const category = option.category || 'General';
+  const groupedOptions = options.reduce<{ [key: string]: CategoryGroup }>((acc, option) => {
+    const category = 'General'; // Use default category since ChatbotOption doesn't have category property
     if (!acc[category]) {
       acc[category] = {
         name: category,
@@ -176,11 +185,41 @@ export function SupportChatbot() {
     return convertedMessages;
   };
 
+  const handleQuickQuestion = async () => {
+    if (!quickQuestion.trim()) return;
+    
+    setIsSubmittingQuestion(true);
+    
+    // Add user message to the chat
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: quickQuestion,
+      timestamp: new Date(),
+    };
+    
+    setLocalMessages((prev) => [...prev, userMessage]);
+    
+    // Simulate bot response
+    setTimeout(() => {
+      const botResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'bot',
+        content: `Thanks for your question: "${quickQuestion}". I'm connecting you with our support team who will be happy to help you with this specific inquiry. In the meantime, you can browse our FAQ options below or start a live chat.`,
+        timestamp: new Date(),
+      };
+      
+      setLocalMessages((prev) => [...prev, botResponse]);
+      setQuickQuestion('');
+      setIsSubmittingQuestion(false);
+    }, 1000);
+  };
+
   const handleCategoryClick = (categoryName: string) => {
     setExpandedCategory(expandedCategory === categoryName ? null : categoryName);
   };
 
-  const handleOptionClick = (option: any) => {
+  const handleOptionClick = (option: ChatbotOption) => {
     // Add user message
     const newMessage: Message = {
       id: Date.now().toString(),
@@ -227,7 +266,6 @@ export function SupportChatbot() {
         console.log('[Chat] Conversation created successfully:', conversation.id);
         setConversationId(conversation.id);
         setIsCreatingConversation(false);
-        setRetryCount(0);
         setShowFallback(false);
         setCurrentStep('admin-chat');
         setAdminChatting(true);
@@ -328,40 +366,78 @@ export function SupportChatbot() {
 
   // Don't render chatbot if on admin page
   if (isAdminPage) {
+    console.log('[Chat] Admin page detected, hiding chatbot');
     return null;
   }
 
-  // Wait for settings to load before deciding whether to show chatbot
-  if (settingsLoading) {
-    return null;
-  }
+  console.log('[Chat] Rendering chatbot:', { 
+    isAdminPage, 
+    settingsLoading, 
+    isChatbotEnabled, 
+    showTawk, 
+    isOpen 
+  });
 
-  // Hide chatbot if disabled (but keep component mounted to prevent flickering)
-  if (!isChatbotEnabled) {
+  // Show chatbot by default, even while loading settings
+  // Only hide if explicitly disabled after settings load
+  if (!settingsLoading && !isChatbotEnabled) {
+    console.log('[Chat] Chatbot disabled, hiding');
     return null;
   }
 
   // show nothing while tawk widget is active - it lives outside React UI
   if (showTawk) {
+    console.log('[Chat] Tawk widget active, hiding chatbot');
     return null;
   }
 
   if (!isOpen) {
+    console.log('[Chat] Rendering toggle button');
     return (
-      <button
-        className={styles.chatbotToggle}
-        onClick={() => setIsOpen(true)}
-        aria-label="Open support chatbot"
-      >
-        💬
-      </button>
+      <>
+        {/* Fallback visible test */}
+        <div 
+          style={{ 
+            position: 'fixed', 
+            bottom: '20px', 
+            right: '20px', 
+            width: '60px', 
+            height: '60px', 
+            backgroundColor: '#9333ea', 
+            borderRadius: '50%', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            color: 'white', 
+            fontSize: '24px', 
+            cursor: 'pointer',
+            zIndex: 9999,
+            boxShadow: '0 8px 24px rgba(147, 51, 234, 0.4)'
+          }}
+          onClick={() => setIsOpen(true)}
+          aria-label="Open support chatbot"
+        >
+          💬
+        </div>
+        <button
+          className={`${styles.chatbotToggle} ${styles.pulse}`}
+          onClick={() => setIsOpen(true)}
+          aria-label="Open support chatbot"
+          style={{ position: 'fixed', bottom: '20px', right: '20px', zIndex: 9999 }}
+        >
+          💬
+        </button>
+      </>
     );
   }
 
   return (
     <div className={styles.chatbotContainer}>
       <div className={styles.chatbotHeader}>
-        <h3>Echoverse Support</h3>
+        <div>
+          <h3>Echoverse Support</h3>
+          <p className={styles.subtitle}>We&apos;re here to help! 💜</p>
+        </div>
         <button
           className={styles.closeButton}
           onClick={() => setIsOpen(false)}
@@ -389,6 +465,34 @@ export function SupportChatbot() {
 
       {currentStep === 'menu' && !adminChatting && (
         <div className={styles.compactMenu}>
+          {/* Quick Question Input */}
+          <div className={styles.quickQuestionContainer}>
+            <input
+              type="text"
+              className={styles.quickQuestionInput}
+              placeholder="Ask a quick question..."
+              value={quickQuestion}
+              onChange={(e) => setQuickQuestion(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && !isSubmittingQuestion) {
+                  handleQuickQuestion();
+                }
+              }}
+              disabled={isSubmittingQuestion}
+            />
+            <button
+              className={styles.quickAskButton}
+              onClick={handleQuickQuestion}
+              disabled={isSubmittingQuestion || !quickQuestion.trim()}
+            >
+              {isSubmittingQuestion ? (
+                <>⏳ Thinking...</>
+              ) : (
+                <>🚀 Ask Question</>
+              )}
+            </button>
+          </div>
+
           {loading ? (
             <div className={styles.loading}>Loading...</div>
           ) : (
@@ -426,12 +530,11 @@ export function SupportChatbot() {
                   <button
                     className={styles.fallbackBtn}
                     onClick={() => {
-                      setRetryCount(0);
                       setShowFallback(false);
                       // Re-trigger the chat with admin
                       const adminChatOption = Object.values(groupedOptions)
-                        .flatMap((cat: any) => cat.items)
-                        .find((opt: any) => opt.is_admin_chat);
+                        .flatMap((cat: CategoryGroup) => cat.items)
+                        .find((opt: ChatbotOption) => opt.is_admin_chat);
                       if (adminChatOption) {
                         handleOptionClick(adminChatOption);
                       }
@@ -459,7 +562,7 @@ export function SupportChatbot() {
                 </div>
               )}
               <div className={styles.categoryList}>
-                {Object.entries(groupedOptions).map(([catName, category]: [string, any]) => (
+                {Object.entries(groupedOptions).map(([catName, category]: [string, CategoryGroup]) => (
                   <div key={catName} className={styles.categoryItem}>
                     <button
                       className={styles.categoryButton}
@@ -473,7 +576,7 @@ export function SupportChatbot() {
                     </button>
                     {expandedCategory === catName && (
                       <div className={styles.categoryOptions}>
-                        {category.items.map((option: any) => (
+                        {category.items.map((option: ChatbotOption) => (
                           <button
                             key={option.id}
                             className={styles.quickOptionButton}
@@ -521,15 +624,16 @@ export function SupportChatbot() {
             )}
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {selectedOption.title === 'Application' && (
+          <div className={styles.actionButtonContainer}>
+            <button
+              className={styles.backButton}
+              onClick={handleGoBack}
+            >
+              ← Back to Menu
+            </button>
+            {(selectedOption.title === 'Application' || selectedOption.title?.includes('Application') || selectedOption.title?.includes('application')) && (
               <button
                 className={styles.actionButton}
-                onClick={() => {
-                  // Dispatch a custom event to open the application modal
-                  window.dispatchEvent(new CustomEvent('openApplicationModal'));
-                  setIsOpen(false);
-                }}
                 style={{
                   padding: '10px 16px',
                   backgroundColor: '#ec4899',
@@ -539,20 +643,24 @@ export function SupportChatbot() {
                   fontSize: '14px',
                   fontWeight: 'bold',
                   cursor: 'pointer',
-                  transition: 'background-color 0.2s'
+                  transition: 'background-color 0.2s',
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#be185d'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#ec4899'}
+                onClick={() => {
+                  // Dispatch a custom event to open the application modal
+                  window.dispatchEvent(new CustomEvent('openApplicationModal'));
+                  setIsOpen(false);
+                }}
               >
                 📋 Fill Out Application Now
               </button>
             )}
-            <button
-              className={styles.backButton}
-              onClick={handleGoBack}
-            >
-              ← Back to Menu
-            </button>
           </div>
         </div>
       )}

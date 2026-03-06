@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { AdminHeader } from '@/components/AdminHeader';
@@ -38,6 +37,14 @@ interface Application {
   created_at: string;
 }
 
+interface DemoRecordingUpdateData {
+  demo_recording_status: Application['demo_recording_status'];
+  demo_recording_review_result?: string;
+  demo_recording_review_notes?: string;
+  demo_recording_submitted_date?: string;
+  demo_recording_reviewed_date?: string;
+}
+
 export default function ApplicationsAdminPage() {
   const router = useRouter();
   const { logout } = useAuth();
@@ -45,12 +52,12 @@ export default function ApplicationsAdminPage() {
   const [loading, setLoading] = useState(true);
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [localReviewResult, setLocalReviewResult] = useState('');
+  const [localReviewNotes, setLocalReviewNotes] = useState('');
+  const [saveTimeout, setSaveTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    loadApplications();
-  }, []);
-
-  const loadApplications = async () => {
+  // Define loadApplications first since it's used as a dependency
+  const loadApplications = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('applications')
@@ -63,15 +70,15 @@ export default function ApplicationsAdminPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updateDemoRecordingStatus = async (id: string, newStatus: Application['demo_recording_status'], reviewData?: {
+  const updateDemoRecordingStatus = useCallback(async (id: string, newStatus: Application['demo_recording_status'], reviewData?: {
     review_result?: string;
     review_notes?: string;
     submitted_date?: string;
   }) => {
     try {
-      const updateData: any = { demo_recording_status: newStatus };
+      const updateData: DemoRecordingUpdateData = { demo_recording_status: newStatus };
       
       if (reviewData) {
         if (reviewData.review_result !== undefined) updateData.demo_recording_review_result = reviewData.review_result;
@@ -96,7 +103,33 @@ export default function ApplicationsAdminPage() {
     } catch (error) {
       console.error('Error updating demo recording status:', error);
     }
-  };
+  }, [selectedApplication, loadApplications]);
+
+  const debouncedSave = useCallback((id: string, status: Application['demo_recording_status'], reviewData: {
+    review_result?: string;
+    review_notes?: string;
+  }) => {
+    if (saveTimeout) {
+      clearTimeout(saveTimeout);
+    }
+    
+    const timeout = setTimeout(() => {
+      updateDemoRecordingStatus(id, status, reviewData);
+    }, 1000); // Save after 1 second of inactivity
+    
+    setSaveTimeout(timeout);
+  }, [saveTimeout, updateDemoRecordingStatus]);
+
+  useEffect(() => {
+    loadApplications();
+  }, [loadApplications]);
+
+  useEffect(() => {
+    if (selectedApplication) {
+      setLocalReviewResult(selectedApplication.demo_recording_review_result || '');
+      setLocalReviewNotes(selectedApplication.demo_recording_review_notes || '');
+    }
+  }, [selectedApplication]);
 
   const updateStatus = async (id: string, newStatus: Application['status']) => {
     try {
@@ -409,10 +442,13 @@ export default function ApplicationsAdminPage() {
                             </label>
                             <input
                               type="text"
-                              value={selectedApplication.demo_recording_review_result || ''}
-                              onChange={(e) => updateDemoRecordingStatus(selectedApplication.id, selectedApplication.demo_recording_status, {
-                                review_result: e.target.value
-                              })}
+                              value={localReviewResult}
+                              onChange={(e) => {
+                                setLocalReviewResult(e.target.value);
+                                debouncedSave(selectedApplication.id, selectedApplication.demo_recording_status, {
+                                  review_result: e.target.value
+                                });
+                              }}
                               placeholder="e.g., Approved - Excellent performance"
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                             />
@@ -425,10 +461,13 @@ export default function ApplicationsAdminPage() {
                             Review Notes
                           </label>
                           <textarea
-                            value={selectedApplication.demo_recording_review_notes || ''}
-                            onChange={(e) => updateDemoRecordingStatus(selectedApplication.id, selectedApplication.demo_recording_status, {
-                              review_notes: e.target.value
-                            })}
+                            value={localReviewNotes}
+                            onChange={(e) => {
+                              setLocalReviewNotes(e.target.value);
+                              debouncedSave(selectedApplication.id, selectedApplication.demo_recording_status, {
+                                review_notes: e.target.value
+                              });
+                            }}
                             placeholder="Enter detailed review notes here..."
                             rows={3}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"

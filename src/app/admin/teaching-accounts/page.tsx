@@ -1,9 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
 import { AdminHeader } from '@/components/AdminHeader';
 import { ProtectedRoute } from '@/components/protected-route';
 import { supabase } from '@/lib/supabase';
@@ -24,8 +21,6 @@ interface TeachingAccount {
 }
 
 export default function TeachingAccountsAdminPage() {
-  const router = useRouter();
-  const { logout } = useAuth();
   const [accounts, setAccounts] = useState<TeachingAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -141,11 +136,6 @@ export default function TeachingAccountsAdminPage() {
       ...prev,
       benefits: (prev.benefits || []).filter((_, i) => i !== index),
     }));
-  };
-
-  const handleLogout = () => {
-    logout();
-    router.push('/');
   };
 
   return (
@@ -273,7 +263,7 @@ export default function TeachingAccountsAdminPage() {
                   </div>
                   <div className="space-y-3 max-h-80 overflow-y-auto bg-gray-50 p-4 rounded-lg border border-gray-200">
                     {(formData.benefits || []).length === 0 ? (
-                      <p className="text-gray-500 italic text-sm py-6 text-center">No benefits added yet. Click "Add Benefit" to add one.</p>
+                      <p className="text-gray-500 italic text-sm py-6 text-center">No benefits added yet. Click &quot;Add Benefit&quot; to add one.</p>
                     ) : (
                       (formData.benefits || []).map((benefit, idx) => (
                         <div key={idx} className="flex gap-3 bg-white p-3 rounded-lg border border-gray-200 hover:border-blue-300 transition">
@@ -402,7 +392,7 @@ export default function TeachingAccountsAdminPage() {
           ) : accounts.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
               <p className="text-gray-500 text-lg font-semibold">No teacher profiles yet</p>
-              <p className="text-gray-400 text-sm mt-1">Click "+ Add New Teacher Account" above to create one</p>
+              <p className="text-gray-400 text-sm mt-1">Click &quot;+ Add New Teacher Account&quot; above to create one</p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

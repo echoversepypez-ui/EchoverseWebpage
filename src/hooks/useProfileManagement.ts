@@ -9,12 +9,11 @@ export interface TeacherProfile {
   qualification?: string;
   experience_years?: number;
   language?: string;
-  rating?: number;
-  lessons_completed?: number;
   bio?: string;
   story?: string;
   availability?: string;
   image?: string; // Path to image in public/teachers folder (e.g., "john-doe.jpg")
+  lessons_completed?: number; // Added missing property
   created_at?: string;
   updated_at?: string;
 }

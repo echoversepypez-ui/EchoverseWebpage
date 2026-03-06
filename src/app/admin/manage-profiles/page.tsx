@@ -38,7 +38,7 @@ export default function ManageProfiles() {
       setTeacherFormData(teacher);
     } else {
       setEditingTeacher(null);
-      setTeacherFormData({ name: '', rating: 4.5, lessons_completed: 0, bio: '', story: '' });
+      setTeacherFormData({ name: '', bio: '', story: '' });
     }
     setShowTeacherModal(true);
   };
@@ -215,7 +215,6 @@ export default function ManageProfiles() {
                       >
                         <div className="flex-1">
                           <h3 className="font-bold text-gray-900">{teacher.name}</h3>
-                          <p className="text-sm text-gray-600">Rating: ⭐ {teacher.rating} | Lessons: {teacher.lessons_completed}</p>
                         </div>
                         <div className="flex gap-2">
                           <button
@@ -491,33 +490,6 @@ export default function ManageProfiles() {
                       placeholder="e.g., Full-time, Flexible"
                       value={teacherFormData.availability || ''}
                       onChange={(e) => setTeacherFormData({ ...teacherFormData, availability: e.target.value })}
-                      className="w-full border-2 border-gray-300 rounded-lg px-4 py-2 focus:border-purple-500 focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Rating & Lessons */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Rating</label>
-                    <input
-                      type="number"
-                      step="0.1"
-                      min="0"
-                      max="5"
-                      placeholder="4.5"
-                      value={teacherFormData.rating || 0}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, rating: parseFloat(e.target.value) })}
-                      className="w-full border-2 border-gray-300 rounded-lg px-4 py-2 focus:border-purple-500 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Lessons Completed</label>
-                    <input
-                      type="number"
-                      placeholder="0"
-                      value={teacherFormData.lessons_completed || 0}
-                      onChange={(e) => setTeacherFormData({ ...teacherFormData, lessons_completed: parseInt(e.target.value) })}
                       className="w-full border-2 border-gray-300 rounded-lg px-4 py-2 focus:border-purple-500 focus:outline-none"
                     />
                   </div>

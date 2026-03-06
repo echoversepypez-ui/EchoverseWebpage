@@ -193,6 +193,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.2] - 2026-03-04
+
+### 🎨 UI/UX Improvements
+
+#### 📋 Applicant Profile UI Enhancements
+**Improved demo recording status display and removed redundant sections**
+
+**Changes Made**:
+- **Removed Duplicate Review Details Section** - Eliminated redundant "Review Details" component that was showing duplicate information
+- **Added Review Date Field** - New "Review Date" field shows when the demo recording was reviewed/approved
+- **Improved Layout** - Updated grid from 2 to 3 columns to accommodate the new review date field
+- **Enhanced Date Display** - Shows formatted review date (e.g., "Mar 4, 2026") or "Not reviewed" status
+- **Cleaned Up Imports** - Removed unused `ReviewDetails` import to resolve lint warnings
+
+**UI Improvements**:
+- ✅ Single, comprehensive demo status section
+- ✅ Clear review timeline with submission and approval dates
+- ✅ Better visual hierarchy with 3-column layout
+- ✅ No redundant information display
+- ✅ Cleaner code with removed unused components
+
+**Technical Improvements**:
+- Fixed CSS class warning (`bg-gradient-to-r` → `bg-linear-to-r`)
+- Improved component maintainability
+- Better responsive design for mobile devices
+
+**Files Modified**:
+- `src/app/applicant/profile/page.tsx` - Updated demo status section layout
+- `src/components/Footer.tsx` - Fixed CSS class warning
+
+---
+
 ## [1.1.1] - 2026-03-02
 
 ### 🐛 Bug Fixes
@@ -770,7 +802,7 @@ Complete launch of Echoverse platform with core features.
 
 ---
 
-**Last Updated**: 2026-03-02
+**Last Updated**: 2026-03-04
 **Maintainer**: Echoverse Development Team
-**Current Version**: 1.1.1
+**Current Version**: 1.1.2
 

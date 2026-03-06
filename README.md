@@ -1,8 +1,40 @@
 # Echoverse Tutorial Online Services
 
-**Version 1.1.1** - A modern, responsive platform for online learning with admin dashboard for managing content, statistics, and support conversations in real-time.
+**Version 1.1.2** - A modern, responsive platform for online learning with admin dashboard for managing content, statistics, and support conversations in real-time.
 
-## 📋 Latest Release - Version 1.1.1 (March 2, 2026)
+## 📋 Latest Release - Version 1.1.2 (March 4, 2026)
+
+### 🎨 UI/UX Improvements
+
+#### 📋 Applicant Profile UI Enhancements
+**Improved demo recording status display and removed redundant sections**
+
+**Changes Made**:
+- **Removed Duplicate Review Details Section** - Eliminated redundant "Review Details" component that was showing duplicate information
+- **Added Review Date Field** - New "Review Date" field shows when the demo recording was reviewed/approved
+- **Improved Layout** - Updated grid from 2 to 3 columns to accommodate the new review date field
+- **Enhanced Date Display** - Shows formatted review date (e.g., "Mar 4, 2026") or "Not reviewed" status
+- **Cleaned Up Imports** - Removed unused `ReviewDetails` import to resolve lint warnings
+
+**UI Improvements**:
+- ✅ Single, comprehensive demo status section
+- ✅ Clear review timeline with submission and approval dates
+- ✅ Better visual hierarchy with 3-column layout
+- ✅ No redundant information display
+- ✅ Cleaner code with removed unused components
+
+**Technical Improvements**:
+- Fixed CSS class warning (`bg-gradient-to-r` → `bg-linear-to-r`)
+- Improved component maintainability
+- Better responsive design for mobile devices
+
+**Files Modified**:
+- `src/app/applicant/profile/page.tsx` - Updated demo status section layout
+- `src/components/Footer.tsx` - Fixed CSS class warning
+
+---
+
+## 📋 Previous Release - Version 1.1.1 (March 2, 2026)
 
 ### 🐛 Critical Bug Fixes
 
@@ -524,8 +556,8 @@ This project is proprietary. All rights reserved by Echoverse Tutorial Online Se
 
 ---
 
-**Last Updated**: March 2, 2026
-**Current Version**: 1.1.1
+**Last Updated**: March 4, 2026
+**Current Version**: 1.1.2
 **Status**: ✅ Production Ready
 
 # Echoverse Tutorial Online Services
